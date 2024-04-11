@@ -37,7 +37,7 @@ from torch_geometric.data import DataLoader
 
 
 class GCN(nn.Module):
-    def __init__(self, input_dim, hidden_dim, out_dim, conv_layers = 2, doutrate = 0.25):
+    def __init__(self, input_dim, hidden_dim, out_dim, conv_layers = 2, doutrate = 0.4):
         super(GCN, self).__init__()
         self.doutrate = doutrate
         self.conv_layers = conv_layers
@@ -104,12 +104,14 @@ def train(dataset, conv_layer, writer,  epochs):
     model = GCN(max(dataset.num_node_features, 1), 32, dataset.num_classes, conv_layers=conv_layer)
     opt = optim.Adam(model.parameters(), lr = 0.01)
     
+    test_accuracies = []
+    
     for epoch in range(0,epochs):
         total_loss = 0
         model.train()
         
         for batch in loader:
-            breakpoint()
+            # breakpoint()
             opt.zero_grad()
             embedding, pred = model(batch)
             label = batch.y
@@ -127,7 +129,9 @@ def train(dataset, conv_layer, writer,  epochs):
         
         if epoch % 10 == 0:
             test_acc = test(test_loader, model)
+            test_accuracies.append(test_acc)
             print("Epoch {}. Loss {:.4f}. Test accuracy {:.4f}".format(epoch, total_loss, test_acc))
+            print("best accuracy is", max(test_accuracies))
             writer.add_scalar("test accuracy", test_acc, epoch)
             
     return model
@@ -158,6 +162,29 @@ def test(loader, model, is_validation = False):
     return correct / total
 
 
+def calculate_diameter(x, y):
+    max_distance = 0
+    n = len(x)
+    for i in range(n):
+        for j in range(i+1, n):
+            distance = np.sqrt((x[i] - x[j])**2 + (y[i] - y[j])**2)
+            if distance > max_distance:
+                max_distance = distance
+    return max_distance
+
+
+def calculate_eccentricity(x, y):
+    data = np.column_stack((x, y))
+    covariance_matrix = np.cov(data.T)
+    eigenvalues, _ = np.linalg.eig(covariance_matrix)
+    max_eigenvalue = np.max(eigenvalues)
+    min_eigenvalue = np.min(eigenvalues)
+    
+    eccentricity = np.sqrt(1 - (min_eigenvalue / max_eigenvalue))
+    return eccentricity
+
+
+
 def visualization_nodembs(dataset, model):
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
     loader = DataLoader(dataset, batch_size=64, shuffle=True)
@@ -173,6 +200,15 @@ def visualization_nodembs(dataset, model):
     embs = torch.cat(embs, dim=0)
 
     xs, ys = zip(*TSNE().fit_transform(embs.detach().numpy()))
+    # print("xs shape is", xs)
+    # print("ys shape is", len(xs))
+    
+    max_distance = calculate_diameter(xs, ys)
+    eccentricity = calculate_eccentricity(xs, ys)
+    
+    print(f"Max distance: {max_distance}")
+    print(f"Eccentricity: {eccentricity}")
+    
     plt.scatter(xs, ys, color=colors)
     plt.show()
 
@@ -183,7 +219,7 @@ if __name__ == "__main__":
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
     conv_layer = 6
-    model = train(dataset, conv_layer, writer, 100)   
+    model = train(dataset, conv_layer, writer, 10)   
     visualization_nodembs(dataset, model)
     
  
