@@ -67,9 +67,8 @@ class GCN(nn.Module):
     def forward(self, data):
         # Data consists of: data.x (feature matrix), data.edge_index (adjecency matrix, what are the edges),
         # data.batch (which node belongs to which graph)
-        print(data.shape)
         print(data)
-        breakpoint()
+        # breakpoint()
         x, edge_index, batch = data.x, data.edge_index, data.batch
         
         # print("X is", x.shape)

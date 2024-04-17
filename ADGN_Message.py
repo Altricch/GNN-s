@@ -30,7 +30,6 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 
 # Datasets we will use
-from torch_geometric.datasets import TUDataset
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
@@ -63,7 +62,7 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Reset parameters Kaiming takes into account activation function, Xavier does not
         init.kaiming_uniform(self.Weights, np.sqrt(5))
         # fan_in and fan_out = number of neurons in and number of neurons out
-        fan_in, _ = init._calculate_fan_in_and_fan_out(self.W)
+        fan_in, _ = init._calculate_fan_in_and_fan_out(self.Weights)
         bound = np.clip(1 / np.sqrt(fan_in), 0, np.inf)
         init.uniform_(self.bias, -bound, bound)
         self.linear.reset_parameters()
@@ -78,32 +77,46 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Convolution of neighbors of previous layer PHI*(X(l-1), N_u)
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
-        aggr_x = self.propagate(aggr_x, edge_index)
+        # breakpoint()
+        
+        #  Step 3: Compute normalization.
+        row, col = edge_index
+        deg = pyg_utils.degree(col, x.size(0), dtype=x.dtype)
+        deg_inv_sqrt = deg.pow(-0.5)
+        deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
+        norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
+
+        
+        
+        
+        aggr_x = self.propagate(edge_index, x = aggr_x, norm = norm)
         
         # Store previous x
         x_prev = x
         
         # Apply function of paper in the forward pass
+        breakpoint()
         x = (W * x_prev.T + aggr_x + self.bias)
         x = self.epsilon*(self.act_func(x))
         x = x_prev + x
         
         return x
     
-    def message(self, x_j, edge_index, size):
+    def message(self, x_j, norm):
         # Compute messages
         # x_j has shape [E, outchannels]
         
-        row, col = edge_index
-        deg = pyg_utils.degree(row, size[0], dtype=x_j.dtype)
-        deg_inv_sqrt = deg.pow(-0.5)
-        norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
+        # row, col = edge_index
+        # breakpoint()
+        # deg = pyg_utils.degree(row, len(size))
+        # deg_inv_sqrt = deg.pow(-0.5)
+        # norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
         
         # Here we add outselves back in
         return norm.view(-1, 1) * x_j
 
 class ADGN(nn.Module):
-    def __init__(self, in_channels, hidden_dim, out_channels, num_layers, epsilon, gamma, antisymmetric = True):
+    def __init__(self, in_channels, hidden_dim, out_channels, num_layers, epsilon = 0.1, gamma = 0.1, antisymmetric = True):
         super(ADGN, self).__init__()
         
         self.in_channels = in_channels
@@ -112,11 +125,13 @@ class ADGN(nn.Module):
         self.epsilon = epsilon
         self.gamma = gamma
         self.antisymmetric = antisymmetric
-        self.linear = nn.Linear(self.hidden_dim, self.out_channels)
+        
         
         self.emb = None
         if self.hidden_dim is not None:
              self.emb = nn.Linear(self.in_channels, hidden_dim, bias=False)
+             
+        
         
         self.conv = nn.ModuleList()
         
@@ -133,14 +148,19 @@ class ADGN(nn.Module):
                 in_channels=self.hidden_dim,
                 out_channels=self.hidden_dim,
             )))
+        
+        self.linear = nn.Linear(self.hidden_dim, self.out_channels)
+        # breakpoint()
 
     def forward(self, x):
         x, edge_idx, edge_w = x.x, x.edge_index, x.edge_weight
         
-        x = self.emb(x)
+        # x = self.emb(x)
+        
+        # breakpoint()
         
         for conv in self.conv:
-            x = conv(x, edge_idx, edge_w)
+            x = conv(x, edge_idx)
         
         x = self.linear(x)
         
@@ -148,8 +168,16 @@ class ADGN(nn.Module):
         
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model = ADGN()
-x = torch.randn(100, 16).to(device)
+
+dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
+model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2)
+print(model)
+x = dataset[0]
+print(model(x).shape)
+# test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
+# print(model(dataset).shape)
+# print(test_loader[0])
+# x = torch.randn(100, 16).to(device)
 
 
 
