@@ -112,6 +112,7 @@ class ADGN(nn.Module):
         self.epsilon = epsilon
         self.gamma = gamma
         self.antisymmetric = antisymmetric
+        self.linear = nn.Linear(self.hidden_dim, self.out_channels)
         
         self.emb = None
         if self.hidden_dim is not None:
@@ -122,20 +123,35 @@ class ADGN(nn.Module):
         
         # Get 
         self.conv.append(ADGNConv(
-            in_channels = in_channels,
-            
+            in_channels = self.in_channels,
+            out_channels=self.hidden_dim,
         ))
         
         # Apply hidden dimensions in conv block
         for _ in range(1, num_layers):
             self.conv.append((ADGNConv(
                 in_channels=self.hidden_dim,
+                out_channels=self.hidden_dim,
             )))
-            
+
+    def forward(self, x):
+        x, edge_idx, edge_w = x.x, x.edge_index, x.edge_weight
         
+        x = self.emb(x)
         
-            
+        for conv in self.conv:
+            x = conv(x, edge_idx, edge_w)
         
+        x = self.linear(x)
+        
+        return x
+        
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+model = ADGN()
+x = torch.randn(100, 16).to(device)
+
+
 
 #TODO: Why multiple times per hidden layer (e.g. num_iterations not clear)
         
