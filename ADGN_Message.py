@@ -13,6 +13,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.nn.init as init
 
+# Visualization 
+from datetime import datetime
+
 # nn module for Neural Network model
 # Implement graph conv, gene conf etc. 
 import torch_geometric.nn as pyg_nn
@@ -77,7 +80,9 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Convolution of neighbors of previous layer PHI*(X(l-1), N_u)
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
-        aggr_x = self.propagate(edge_index, x = aggr_x)
+        # breakpoint()
+        aggr_x = self.propagate(edge_index, x = aggr_x, size=aggr_x.size(0))
+        
         
         # Store previous x
         x_prev = x
@@ -89,12 +94,13 @@ class ADGNConv(pyg_nn.MessagePassing):
         
         return x
     
-    def message(self, edge_index, x_j):
+    def message(self, edge_index, x_j, size):
         # Compute messages
         # x_j has shape [E, outchannels]
         
         row, col = edge_index
-        deg = pyg_utils.degree(row, x.size(0))
+        # breakpoint()
+        deg = pyg_utils.degree(row, size)
         deg_inv_sqrt = deg.pow(-0.5)
         norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
         
@@ -139,19 +145,110 @@ class ADGN(nn.Module):
         x = self.linear(x)
         
         return x
+    
+def visualization_nodembs(dataset, model):
+    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
+    loader = DataLoader(dataset, batch_size=64, shuffle=True)
+    embs = []
+    colors = []
+    for batch in loader:
+        # print("batch is", batch)
+        emb, pred = model(batch)
+        embs.append(emb)
+        # for elem in batch.y:
+            # print(elem)
+        colors += [color_list[y] for y in batch.y]
+    embs = torch.cat(embs, dim=0)
+
+    xs, ys = zip(*TSNE().fit_transform(embs.detach().numpy()))
+    # print("xs shape is", xs)
+    # print("ys shape is", len(xs))
+    
+    # max_distance = calculate_diameter(xs, ys)
+    # eccentricity = calculate_eccentricity(xs, ys)
+    
+    # print(f"Max distance: {max_distance}")
+    # print(f"Eccentricity: {eccentricity}")
+    
+    plt.scatter(xs, ys, color=colors)
+    plt.show()    
+
+def train(dataset, conv_layer, writer,  epochs):
+    test_loader = loader =  DataLoader(dataset, batch_size = 64, shuffle = True)
+
+    # Build model
+    # self, in_channels, hidden_dim, out_channels, num_layers
+    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, num_layers=conv_layer)
+    opt = optim.Adam(model.parameters(), lr = 0.01)
+    
+    test_accuracies = []
+    
+    for epoch in range(0,epochs):
+        total_loss = 0
+        model.train()
         
+        for batch in loader:
+            # breakpoint()
+            opt.zero_grad()
+            embedding, pred = model(batch)
+            label = batch.y
+        
+            pred = pred[batch.train_mask]
+            label = label[batch.train_mask]
+                
+            loss = model.loss(pred, label)
+            loss.backward()
+            opt.step()
+            total_loss += loss.item() * batch.num_graphs
+        total_loss /= len(loader.dataset)
+        # tensorboard
+        writer.add_scalar("Loss", total_loss, epoch)
+        
+        if epoch % 10 == 0:
+            test_acc = test(test_loader, model)
+            test_accuracies.append(test_acc)
+            print("Epoch {}. Loss {:.4f}. Test accuracy {:.4f}".format(epoch, total_loss, test_acc))
+            print("best accuracy is", max(test_accuracies))
+            writer.add_scalar("test accuracy", test_acc, epoch)
+            
+    return model
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2)
-print(model)
-x = dataset[0]
-print(model(x).shape)
-# test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
-# print(model(dataset).shape)
-# print(test_loader[0])
-# x = torch.randn(100, 16).to(device)
+def test(loader, model, is_validation = False):
+    model.eval()
+    
+    correct = 0
+    for data in loader:
+        with torch.no_grad():
+            embeddings, pred = model(data)
+            pred = pred.argmax(dim=1)
+            label = data.y
+            
+        mask = data.val_mask if is_validation else data.test_mask
+        
+        # Node classification: only evaluate in test set
+        pred = pred[mask]
+        label = data.y[mask]
+            
+        correct += pred.eq(label).sum().item()
+        
+    else:
+        total = 0
+        for data in loader.dataset:
+            total += torch.sum(data.test_mask).item()
+    return correct / total
+
+if __name__ == '__main__':
+    
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+    dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
+    conv_layer = 6
+    model = train(dataset, conv_layer, writer, 10)   
+    visualization_nodembs(dataset, model)
+    
+
 
 
 
