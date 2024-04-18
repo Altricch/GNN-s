@@ -22,6 +22,7 @@ import torch_geometric.nn as pyg_nn
 
 # Performs some graph utlity functions
 import torch_geometric.utils as pyg_utils
+from torch_geometric.utils import add_self_loops, degree
 
 # For graph visualization
 import networkx as nx
@@ -81,7 +82,15 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
         # breakpoint()
-        aggr_x = self.propagate(edge_index, x = aggr_x, size=aggr_x.size(0))
+        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        row, col = edge_index
+        # breakpoint()
+        deg = pyg_utils.degree(row, aggr_x.size()[0])
+        deg_inv_sqrt = deg.pow(-0.5)
+        # Formula 7 of paper
+        norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
+        
+        aggr_x = self.propagate(edge_index, x = aggr_x, norm=norm)
         
         
         # Store previous x
@@ -94,17 +103,14 @@ class ADGNConv(pyg_nn.MessagePassing):
         
         return x
     
-    def message(self, edge_index, x_j, size):
+    def message(self, x_j, norm):
         # Compute messages
         # x_j has shape [E, outchannels]
         
-        row, col = edge_index
-        # breakpoint()
-        deg = pyg_utils.degree(row, size)
-        deg_inv_sqrt = deg.pow(-0.5)
-        norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
+        
         
         # Here we add outselves back in
+        # breakpoint()
         return norm.view(-1, 1) * x_j
 
 class ADGN(nn.Module):
@@ -135,7 +141,7 @@ class ADGN(nn.Module):
         self.linear = nn.Linear(self.hidden_dim, self.out_channels)
 
     def forward(self, x):
-        x, edge_idx, edge_w = x.x, x.edge_index, x.edge_weight
+        x, edge_idx = x.x, x.edge_index, 
         
         x = self.emb(x)
         
@@ -148,7 +154,7 @@ class ADGN(nn.Module):
     
 def visualization_nodembs(dataset, model):
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-    loader = DataLoader(dataset, batch_size=64, shuffle=True)
+    loader = DataLoader(dataset, batch_size=1, shuffle=True)
     embs = []
     colors = []
     for batch in loader:
@@ -174,7 +180,7 @@ def visualization_nodembs(dataset, model):
     plt.show()    
 
 def train(dataset, conv_layer, writer,  epochs):
-    test_loader = loader =  DataLoader(dataset, batch_size = 64, shuffle = True)
+    test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
 
     # Build model
     # self, in_channels, hidden_dim, out_channels, num_layers
@@ -244,9 +250,14 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-    conv_layer = 6
-    model = train(dataset, conv_layer, writer, 10)   
-    visualization_nodembs(dataset, model)
+    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2)
+    print(model)
+    x = dataset
+    print(model(x).shape)
+    
+    # conv_layer = 6
+    # model = train(dataset, conv_layer, writer, 10)   
+    # visualization_nodembs(dataset, model)
     
 
 
