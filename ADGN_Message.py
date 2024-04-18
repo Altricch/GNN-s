@@ -77,40 +77,26 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Convolution of neighbors of previous layer PHI*(X(l-1), N_u)
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
-        # breakpoint()
-        
-        #  Step 3: Compute normalization.
-        row, col = edge_index
-        deg = pyg_utils.degree(col, x.size(0), dtype=x.dtype)
-        deg_inv_sqrt = deg.pow(-0.5)
-        deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
-        norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
-
-        
-        
-        
-        aggr_x = self.propagate(edge_index, x = aggr_x, norm = norm)
+        aggr_x = self.propagate(edge_index, x = aggr_x)
         
         # Store previous x
         x_prev = x
         
         # Apply function of paper in the forward pass
-        breakpoint()
-        x = (W * x_prev.T + aggr_x + self.bias)
+        x = (x_prev @ W + aggr_x + self.bias)
         x = self.epsilon*(self.act_func(x))
         x = x_prev + x
         
         return x
     
-    def message(self, x_j, norm):
+    def message(self, edge_index, x_j):
         # Compute messages
         # x_j has shape [E, outchannels]
         
-        # row, col = edge_index
-        # breakpoint()
-        # deg = pyg_utils.degree(row, len(size))
-        # deg_inv_sqrt = deg.pow(-0.5)
-        # norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
+        row, col = edge_index
+        deg = pyg_utils.degree(row, x.size(0))
+        deg_inv_sqrt = deg.pow(-0.5)
+        norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
         
         # Here we add outselves back in
         return norm.view(-1, 1) * x_j
@@ -129,18 +115,9 @@ class ADGN(nn.Module):
         
         self.emb = None
         if self.hidden_dim is not None:
-             self.emb = nn.Linear(self.in_channels, hidden_dim, bias=False)
-             
-        
+            self.emb = nn.Linear(self.in_channels, hidden_dim, bias=False)
         
         self.conv = nn.ModuleList()
-        
-        
-        # Get 
-        self.conv.append(ADGNConv(
-            in_channels = self.in_channels,
-            out_channels=self.hidden_dim,
-        ))
         
         # Apply hidden dimensions in conv block
         for _ in range(1, num_layers):
@@ -150,14 +127,11 @@ class ADGN(nn.Module):
             )))
         
         self.linear = nn.Linear(self.hidden_dim, self.out_channels)
-        # breakpoint()
 
     def forward(self, x):
         x, edge_idx, edge_w = x.x, x.edge_index, x.edge_weight
         
-        # x = self.emb(x)
-        
-        # breakpoint()
+        x = self.emb(x)
         
         for conv in self.conv:
             x = conv(x, edge_idx)
