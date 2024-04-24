@@ -55,7 +55,8 @@ class ADGNConv(pyg_nn.MessagePassing):
         self.gamma = gamma
         self.epsilon = epsilon
         self.act_func = nn.Tanh()  
-        self.antisymmetry = antisymmetry    
+        self.antisymmetry = antisymmetry   
+        self.best_accuracy = -1 
         
         # Defines learnable weighs and biases, where W has (nxn) and bias is (n)
         self.Weights = nn.Parameter(torch.zeros((self.in_channels, self.in_channels)), requires_grad=True)
@@ -185,6 +186,7 @@ def visualization_nodembs(dataset, model):
     # print(f"Eccentricity: {eccentricity}")
     
     plt.scatter(xs, ys, color=colors)
+    plt.title(f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%, symmetry {args.symmetric}")
     plt.show()    
 
 def train(dataset, conv_layer, writer,  epochs):
@@ -198,6 +200,8 @@ def train(dataset, conv_layer, writer,  epochs):
     loss_fn = nn.CrossEntropyLoss()
     test_accuracies = []
     
+    print("#"*20 + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {model.antisymmetric} " + "#"*20)
+
     for epoch in range(0,epochs):
         total_loss = 0
         model.train()
@@ -227,6 +231,7 @@ def train(dataset, conv_layer, writer,  epochs):
             test_acc = test(test_loader, model)
             test_accuracies.append(test_acc)
             print("Epoch {}. Loss {:.4f}. Test accuracy {:.4f}".format(epoch, total_loss, test_acc))
+            model.best_accuracy = max(test_accuracies)
             print("best accuracy is", max(test_accuracies))
             writer.add_scalar("test accuracy", test_acc, epoch)
             
@@ -257,19 +262,29 @@ def test(loader, model, is_validation = False):
             total += torch.sum(data.test_mask).item()
     return correct / total
 
+### Flags Areas ###
+import argparse
+parser = argparse.ArgumentParser(description='Process some inputs.')
+parser.add_argument('--epoch', type=int, help='Epoch Amount', default=100)
+parser.add_argument('--conv', type=int, help='Conv Amount', default=3)
+parser.add_argument('--asym', type=bool, help='Use AntiSymmetric Weights', default=True)
+
+
 if __name__ == '__main__':
-    
+
+    args = parser.parse_args()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2)
+    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2, antisymmetric=args.asym)
     # print(model)
     # emb,x = dataset
     # print(model(x).shape)
     
-    conv_layer = 30
-    model = train(dataset, conv_layer, writer, 100)   
+    epochs = args.epoch
+    conv_layer = args.conv
+    model = train(dataset, conv_layer, writer, epochs)   
     visualization_nodembs(dataset, model)
     
 

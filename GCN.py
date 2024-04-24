@@ -45,6 +45,7 @@ class GCN(nn.Module):
         # test = getattr(pyg_nn, "GCNConv")
         # breakpoint()
         # Put all our convolution operations
+        self.best_accuracy = -1
         self.convs = nn.ModuleList()
         self.convs.append(self.build_conv_model(input_dim, hidden_dim))
         for i in range(conv_layers):
@@ -106,6 +107,8 @@ def train(dataset, conv_layer, writer,  epochs):
     opt = optim.Adam(model.parameters(), lr = 0.01)
     
     test_accuracies = []
+
+    print("#"*20 + " Running GCN, with " + str(epochs) + " epochs " + "and "+ str(conv_layer)+" convs " +"#"*20)
     
     for epoch in range(0,epochs):
         total_loss = 0
@@ -132,6 +135,7 @@ def train(dataset, conv_layer, writer,  epochs):
             test_acc = test(test_loader, model)
             test_accuracies.append(test_acc)
             print("Epoch {}. Loss {:.4f}. Test accuracy {:.4f}".format(epoch, total_loss, test_acc))
+            model.best_accuracy = max(test_accuracies)
             print("best accuracy is", max(test_accuracies))
             writer.add_scalar("test accuracy", test_acc, epoch)
             
@@ -205,16 +209,23 @@ def visualization_nodembs(dataset, model):
     # print("ys shape is", len(xs))
     
     plt.scatter(xs, ys, color=colors)
+    plt.title(f"GCN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%")
     plt.show()
 
+### Flags Areas ###
+import argparse
+parser = argparse.ArgumentParser(description='Process some inputs.')
+parser.add_argument('--epoch', type=int, help='Epoch Amount', default=100)
+parser.add_argument('--conv', type=int, help='Conv Amount', default=3)
 
 if __name__ == "__main__":
 
+    args = parser.parse_args()
     # Node classification
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-    conv_layer = 3
-    model = train(dataset, conv_layer, writer, 100)   
+    conv_layer = args.conv
+    model = train(dataset, conv_layer, writer, args.epoch)   
     visualization_nodembs(dataset, model)
     
  
