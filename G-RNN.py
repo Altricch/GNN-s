@@ -1,3 +1,6 @@
+#https://medium.com/stanford-cs224w/wikinet-an-experiment-in-recurrent-graph-neural-networks-3f149676fbf3
+#https://colab.research.google.com/drive/1geXYFIopoh7W4bLFrICqdkh1HuVySLQn?usp=sharing
+
 import torch
 import torch.nn as nn
 from torch_geometric.nn import GCN  # import any GNN -- we'll use GCN in this example
@@ -40,7 +43,7 @@ class GRNN(nn.Module):
     #def __init__(self, pyg_graph):   
     def __init__(self, data, sequence_path_length=32, gnn_hidden_size=128, node_embed_size=64, lstm_hidden_size=32, conv_l=3):
         super().__init__()
-        self.gnn = GCN(in_channels=data.shape[1], #num features, 
+        self.gnn = GCN(in_channels=data.x.shape[1], #num features, 
                        hidden_channels=gnn_hidden_size, 
                        num_layers=conv_l, 
                        out_channels=node_embed_size)
@@ -53,9 +56,10 @@ class GRNN(nn.Module):
         self.lstm = nn.LSTM(input_size=node_embed_size,
                             hidden_size=lstm_hidden_size,
                             batch_first=True)
-        self.pred_head = nn.Linear(lstm_hidden_size, data.shape[0]) #num nodes)
+        self.pred_head = nn.Linear(lstm_hidden_size, data.x.shape[0]) #num nodes)
 
     def forward(self, data, indices):
+        print("merdone nel forward")
         breakpoint()
         print(data.size())
         print(data)
@@ -75,12 +79,17 @@ def train(dataset, conv_layer, writer,  epochs):
     test_loader = loader =  DataLoader(dataset, batch_size = 64, shuffle = True)
 
     # Build model
-    model = GCN(max(dataset.num_node_features, 1), 32, dataset.num_classes, conv_layers=conv_layer)
+    model = GRNN(data=dataset.data, 
+                sequence_path_length=32, 
+                gnn_hidden_size=128, 
+                node_embed_size=64,
+                lstm_hidden_size=32,
+                conv_l=3)
     opt = optim.Adam(model.parameters(), lr = 0.01)
     
     test_accuracies = []
 
-    print("#"*20 + " Running GCN, with " + str(epochs) + " epochs " + "and "+ str(conv_layer)+" convs " +"#"*20)
+    print("#"*20 + " Running GRNN, with " + str(epochs) + " epochs " + "and "+ str(conv_layer)+" convs " +"#"*20)
     
     for epoch in range(0,epochs):
         total_loss = 0
@@ -89,7 +98,7 @@ def train(dataset, conv_layer, writer,  epochs):
         for batch in loader:
             # breakpoint()
             opt.zero_grad()
-            embedding, pred = model(batch)
+            embedding, pred = model(batch, np.arange(0,100))
             label = batch.y
         
             pred = pred[batch.train_mask]
@@ -137,3 +146,29 @@ def test(loader, model, is_validation = False):
             total += torch.sum(data.test_mask).item()
     return correct / total
 
+
+
+
+### Flags Areas ###
+import argparse
+parser = argparse.ArgumentParser(description='Process some inputs.')
+parser.add_argument('--epoch', type=int, help='Epoch Amount', default=100)
+parser.add_argument('--conv', type=int, help='Conv Amount', default=3)
+parser.add_argument('--asym', type=bool, help='Use AntiSymmetric Weights', default=1)
+
+
+if __name__ == '__main__':
+
+    args = parser.parse_args()
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+    dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
+    
+    epochs = args.epoch
+    conv_layer = args.conv
+
+    print("li mortacci tua: ", dataset.data)
+
+    model = train(dataset.data, conv_layer, writer, epochs)   
+    
