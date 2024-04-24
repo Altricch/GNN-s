@@ -67,7 +67,7 @@ class GCN(nn.Module):
     def forward(self, data):
         # Data consists of: data.x (feature matrix), data.edge_index (adjecency matrix, what are the edges),
         # data.batch (which node belongs to which graph)
-        print(data)
+        # print(data)
         # breakpoint()
         x, edge_index, batch = data.x, data.edge_index, data.batch
         
@@ -163,26 +163,26 @@ def test(loader, model, is_validation = False):
     return correct / total
 
 
-def calculate_diameter(x, y):
-    max_distance = 0
-    n = len(x)
-    for i in range(n):
-        for j in range(i+1, n):
-            distance = np.sqrt((x[i] - x[j])**2 + (y[i] - y[j])**2)
-            if distance > max_distance:
-                max_distance = distance
-    return max_distance
+# def calculate_diameter(x, y):
+#     max_distance = 0
+#     n = len(x)
+#     for i in range(n):
+#         for j in range(i+1, n):
+#             distance = np.sqrt((x[i] - x[j])**2 + (y[i] - y[j])**2)
+#             if distance > max_distance:
+#                 max_distance = distance
+#     return max_distance
 
 
-def calculate_eccentricity(x, y):
-    data = np.column_stack((x, y))
-    covariance_matrix = np.cov(data.T)
-    eigenvalues, _ = np.linalg.eig(covariance_matrix)
-    max_eigenvalue = np.max(eigenvalues)
-    min_eigenvalue = np.min(eigenvalues)
+# def calculate_eccentricity(x, y):
+#     data = np.column_stack((x, y))
+#     covariance_matrix = np.cov(data.T)
+#     eigenvalues, _ = np.linalg.eig(covariance_matrix)
+#     max_eigenvalue = np.max(eigenvalues)
+#     min_eigenvalue = np.min(eigenvalues)
     
-    eccentricity = np.sqrt(1 - (min_eigenvalue / max_eigenvalue))
-    return eccentricity
+#     eccentricity = np.sqrt(1 - (min_eigenvalue / max_eigenvalue))
+#     return eccentricity
 
 
 
@@ -204,12 +204,6 @@ def visualization_nodembs(dataset, model):
     # print("xs shape is", xs)
     # print("ys shape is", len(xs))
     
-    max_distance = calculate_diameter(xs, ys)
-    eccentricity = calculate_eccentricity(xs, ys)
-    
-    print(f"Max distance: {max_distance}")
-    print(f"Eccentricity: {eccentricity}")
-    
     plt.scatter(xs, ys, color=colors)
     plt.show()
 
@@ -219,8 +213,8 @@ if __name__ == "__main__":
     # Node classification
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-    conv_layer = 6
-    model = train(dataset, conv_layer, writer, 10)   
+    conv_layer = 3
+    model = train(dataset, conv_layer, writer, 100)   
     visualization_nodembs(dataset, model)
     
  

@@ -37,6 +37,10 @@ import matplotlib.pyplot as plt
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
+
+torch.manual_seed(42)
+np.random.seed(42)
+
 class ADGNConv(pyg_nn.MessagePassing):
     def __init__(self, 
                  in_channels: int,
@@ -147,27 +151,30 @@ class ADGN(nn.Module):
         
         for conv in self.conv:
             x = conv(x, edge_idx)
+            emb = x
         
         x = self.linear(x)
         # print("X is", x.)
-        return x
+        return emb, x
     
     
 def visualization_nodembs(dataset, model):
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-    loader = DataLoader(dataset, batch_size=1, shuffle=True)
+    loader = DataLoader(dataset, batch_size=1, shuffle=False)
     embs = []
     colors = []
     for batch in loader:
         # print("batch is", batch)
-        emb = model(batch)
+        emb, pred = model(batch)
+        # print(emb.shape)
         embs.append(emb)
+        
         # for elem in batch.y:
             # print(elem)
         colors += [color_list[y] for y in batch.y]
     embs = torch.cat(embs, dim=0)
 
-    xs, ys = zip(*TSNE().fit_transform(embs.detach().numpy()))
+    xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
     # print("xs shape is", xs)
     # print("ys shape is", len(xs))
     
@@ -199,7 +206,7 @@ def train(dataset, conv_layer, writer,  epochs):
             # print(model(batch)[0])
             # breakpoint()
             opt.zero_grad()
-            pred = model(batch)
+            emb, pred = model(batch)
             label = batch.y
             
             # print("batch mask", np.where(batch.train_mask == True))
@@ -232,7 +239,7 @@ def test(loader, model, is_validation = False):
     correct = 0
     for data in loader:
         with torch.no_grad():
-            pred = model(data)
+            emb, pred = model(data)
             pred = pred.argmax(dim=1)
             label = data.y
             
@@ -257,12 +264,12 @@ if __name__ == '__main__':
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
     model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2)
-    print(model)
-    x = dataset
-    print(model(x).shape)
+    # print(model)
+    # emb,x = dataset
+    # print(model(x).shape)
     
-    conv_layer = 3
-    model = train(dataset, conv_layer, writer, 10)   
+    conv_layer = 30
+    model = train(dataset, conv_layer, writer, 100)   
     visualization_nodembs(dataset, model)
     
 
