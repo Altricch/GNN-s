@@ -186,16 +186,16 @@ def visualization_nodembs(dataset, model):
     # print(f"Eccentricity: {eccentricity}")
     
     plt.scatter(xs, ys, color=colors)
-    plt.title(f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%, symmetry {args.symmetric}")
+    plt.title(f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%, symmetry {model.antisymmetry}")
     plt.show()    
 
-def train(dataset, conv_layer, writer,  epochs):
+def train(dataset, conv_layer, writer,  epochs, anti_symmetric =True):
     test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
     # print("LOADER IS", loader)
 
     # Build model
     # self, in_channels, hidden_dim, out_channels, num_layers
-    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, num_layers=conv_layer)
+    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, num_layers=conv_layer, antisymmetric=anti_symmetric)
     opt = optim.Adam(model.parameters(), lr = 0.01)
     loss_fn = nn.CrossEntropyLoss()
     test_accuracies = []
@@ -267,24 +267,27 @@ import argparse
 parser = argparse.ArgumentParser(description='Process some inputs.')
 parser.add_argument('--epoch', type=int, help='Epoch Amount', default=100)
 parser.add_argument('--conv', type=int, help='Conv Amount', default=3)
-parser.add_argument('--asym', type=bool, help='Use AntiSymmetric Weights', default=True)
-
+parser.add_argument('--asym', type=bool, help='Use AntiSymmetric Weights', default=1)
 
 if __name__ == '__main__':
 
-    args = parser.parse_args()
+    #args = parser.parse_args()
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-    model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2, antisymmetric=args.asym)
+    #model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2, antisymmetric=args.asym)
     # print(model)
     # emb,x = dataset
     # print(model(x).shape)
+
+    args = parser.parse_args()
     
     epochs = args.epoch
     conv_layer = args.conv
-    model = train(dataset, conv_layer, writer, epochs)   
+    antisymmetry = True if args.asym == 1 else False 
+    print(antisymmetry)
+    model = train(dataset, conv_layer, writer, epochs, anti_symmetric = antisymmetry)   
     visualization_nodembs(dataset, model)
     
 
