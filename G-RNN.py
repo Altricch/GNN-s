@@ -75,11 +75,11 @@ class GRNN(nn.Module):
         predictions = self.pred_head(h_n)
         return F.log_softmax(predictions, dim=1)
     
-def train(dataset, conv_layer, writer,  epochs):
+def train(data, conv_layer, writer,  epochs):
     test_loader = loader =  DataLoader(dataset, batch_size = 64, shuffle = True)
 
     # Build model
-    model = GRNN(data=dataset.data, 
+    model = GRNN(data=data, 
                 sequence_path_length=32, 
                 gnn_hidden_size=128, 
                 node_embed_size=64,
