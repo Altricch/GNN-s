@@ -160,7 +160,7 @@ def visualization_nodembs(dataset, model):
     colors = []
     for batch in loader:
         # print("batch is", batch)
-        emb, pred = model(batch)
+        emb = model(batch)
         embs.append(emb)
         # for elem in batch.y:
             # print(elem)
@@ -263,7 +263,7 @@ if __name__ == '__main__':
     
     conv_layer = 3
     model = train(dataset, conv_layer, writer, 10)   
-    # visualization_nodembs(dataset, model)
+    visualization_nodembs(dataset, model)
     
 
 
