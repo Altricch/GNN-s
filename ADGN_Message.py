@@ -156,8 +156,8 @@ class ADGN(nn.Module):
         
         x = self.linear(x)
         # print("X is", x.)
-        return emb, x
-    
+        return emb, x  
+  
     
 def visualization_nodembs(dataset, model):
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]

@@ -38,7 +38,7 @@ from torch_geometric.data import DataLoader
 
 class GCN(nn.Module):
     def __init__(self, input_dim, hidden_dim, out_dim, conv_layers = 2, doutrate = 0.4):
-        super(GCN, self).__init__()
+        super().__init__()
         self.doutrate = doutrate
         self.conv_layers = conv_layers
         # print("conv layer initialized to", conv_layers)
