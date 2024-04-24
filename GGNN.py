@@ -146,3 +146,4 @@ for epoch in range(1, 51):
     print('Epoch: {:03d}, Train Acc: {:.5f}, '
           'Val Acc: {:.5f}, Test Acc: {:.5f}'.format(epoch, train_acc,
                                                        val_acc, test_acc))
+    

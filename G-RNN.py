@@ -60,9 +60,6 @@ class GRNN(nn.Module):
 
     def forward(self, data, indices):
         print("merdone nel forward")
-        breakpoint()
-        print(data.size())
-        print(data)
 
         x , edge_index = data.x, data.edge_index
 
