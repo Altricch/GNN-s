@@ -152,10 +152,6 @@ class ADGN(nn.Module):
         # print("X is", x.)
         return x
     
-    def loss(self, pred, label):
-        # Since we return log softmax we need to return negative log likelihood
-        print("IN LOSS:", pred, " WITH LABEL", label)
-        return nn.CrossEntropyLoss(pred, label)
     
 def visualization_nodembs(dataset, model):
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
@@ -192,7 +188,7 @@ def train(dataset, conv_layer, writer,  epochs):
     # self, in_channels, hidden_dim, out_channels, num_layers
     model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, num_layers=conv_layer)
     opt = optim.Adam(model.parameters(), lr = 0.01)
-    
+    loss_fn = nn.CrossEntropyLoss()
     test_accuracies = []
     
     for epoch in range(0,epochs):
@@ -200,24 +196,19 @@ def train(dataset, conv_layer, writer,  epochs):
         model.train()
         
         for batch in loader:
-            print("hi")
-            print(model(batch)[0])
+            # print(model(batch)[0])
             # breakpoint()
             opt.zero_grad()
             pred = model(batch)
             label = batch.y
-
-            
             
             # print("batch mask", np.where(batch.train_mask == True))
-            print(pred[batch.train_mask])
-            # pred = torch.argmax(pred[batch.train_mask], dim=1)
-            pred = pred[batch.train_mask].detach()
+            # print(pred[batch.train_mask])
+            
+            pred = pred[batch.train_mask]
             label = label[batch.train_mask]
                 
-            print("PRED ", pred, " LABEL", label)    
-                
-            loss = model.loss(pred, label)
+            loss = loss_fn(pred, label)
             loss.backward()
             opt.step()
             total_loss += loss.item() * batch.num_graphs
@@ -241,7 +232,7 @@ def test(loader, model, is_validation = False):
     correct = 0
     for data in loader:
         with torch.no_grad():
-            embeddings, pred = model(data)
+            pred = model(data)
             pred = pred.argmax(dim=1)
             label = data.y
             
