@@ -149,8 +149,13 @@ class ADGN(nn.Module):
             x = conv(x, edge_idx)
         
         x = self.linear(x)
-        
+        # print("X is", x.)
         return x
+    
+    def loss(self, pred, label):
+        # Since we return log softmax we need to return negative log likelihood
+        print("IN LOSS:", pred, " WITH LABEL", label)
+        return nn.CrossEntropyLoss(pred, label)
     
 def visualization_nodembs(dataset, model):
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
@@ -181,6 +186,7 @@ def visualization_nodembs(dataset, model):
 
 def train(dataset, conv_layer, writer,  epochs):
     test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
+    # print("LOADER IS", loader)
 
     # Build model
     # self, in_channels, hidden_dim, out_channels, num_layers
@@ -194,13 +200,22 @@ def train(dataset, conv_layer, writer,  epochs):
         model.train()
         
         for batch in loader:
+            print("hi")
+            print(model(batch)[0])
             # breakpoint()
             opt.zero_grad()
-            embedding, pred = model(batch)
+            pred = model(batch)
             label = batch.y
-        
-            pred = pred[batch.train_mask]
+
+            
+            
+            # print("batch mask", np.where(batch.train_mask == True))
+            print(pred[batch.train_mask])
+            # pred = torch.argmax(pred[batch.train_mask], dim=1)
+            pred = pred[batch.train_mask].detach()
             label = label[batch.train_mask]
+                
+            print("PRED ", pred, " LABEL", label)    
                 
             loss = model.loss(pred, label)
             loss.backward()
@@ -255,8 +270,8 @@ if __name__ == '__main__':
     x = dataset
     print(model(x).shape)
     
-    # conv_layer = 6
-    # model = train(dataset, conv_layer, writer, 10)   
+    conv_layer = 3
+    model = train(dataset, conv_layer, writer, 10)   
     # visualization_nodembs(dataset, model)
     
 
