@@ -1,6 +1,5 @@
 # Gated Graph nn
 import os
-import torch
 import os.path as osp
 import torch
 import torch.nn as nn
@@ -12,6 +11,9 @@ from torch_geometric.data import DataLoader
 from torch_geometric.nn.inits import uniform
 from torch.nn import Parameter as Param
 from torch import Tensor
+
+from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
 
 torch.manual_seed(42)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -89,8 +91,8 @@ class GatedGraphConv(MessagePassing):
     def message(self, x_j, edge_weight):
         return x_j if edge_weight is None else edge_weight.view(-1, 1) * x_j
 
-    def message_and_aggregate(self, adj_t, x):
-        return matmul(adj_t, x, reduce=self.aggr)
+    # def message_and_aggregate(self, adj_t, x):
+    #     return matmul(adj_t, x, reduce=self.aggr)
 
     def __repr__(self):
         return '{}({}, num_layers={})'.format(self.__class__.__name__,
@@ -110,16 +112,6 @@ class GGNN(torch.nn.Module):
         return F.log_softmax(x, dim=-1)
 
 
-model = GGNN().to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-loss_fn = nn.CrossEntropyLoss()
-
-
-test_dataset = dataset[:len(dataset) // 10]
-train_dataset = dataset[len(dataset) // 10:]
-test_loader = DataLoader(test_dataset)
-train_loader = DataLoader(train_dataset)
-
 def train():
     model.train()
     optimizer.zero_grad()
@@ -137,13 +129,58 @@ def test():
     return accs
 
 
-for epoch in range(1, 51):
-    train()
-    accs = test()
-    train_acc = accs[0]
-    val_acc = accs[1]
-    test_acc = accs[2]
-    print('Epoch: {:03d}, Train Acc: {:.5f}, '
-          'Val Acc: {:.5f}, Test Acc: {:.5f}'.format(epoch, train_acc,
-                                                       val_acc, test_acc))
-    
+def visualization_nodembs(dataset, model):
+    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
+    loader = DataLoader(dataset, batch_size=1, shuffle=False)
+    embs = []
+    colors = []
+    for batch in loader:
+        print("batch is", batch)
+        emb, pred = model(batch)
+        # print(emb.shape)
+        embs.append(emb)
+
+        # for elem in batch.y:
+        # print(elem)
+        colors += [color_list[y] for y in batch.y]
+    embs = torch.cat(embs, dim=0)
+
+    xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
+    # print("xs shape is", xs)
+    # print("ys shape is", len(xs))
+
+    # max_distance = calculate_diameter(xs, ys)
+    # eccentricity = calculate_eccentricity(xs, ys)
+
+    # print(f"Max distance: {max_distance}")
+    # print(f"Eccentricity: {eccentricity}")
+
+    plt.scatter(xs, ys, color=colors)
+    plt.title( "swag")
+        #f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy * 100}%, symmetry {model.antisymmetry}")
+    plt.show()
+
+
+
+
+if __name__ == '__main__':
+    model = GGNN().to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    loss_fn = nn.CrossEntropyLoss()
+
+    test_dataset = dataset[:len(dataset) // 10]
+    train_dataset = dataset[len(dataset) // 10:]
+    test_loader = DataLoader(test_dataset)
+    train_loader = DataLoader(train_dataset)
+
+    for epoch in range(1, 2):
+        train()
+        accs = test()
+        train_acc = accs[0]
+        val_acc = accs[1]
+        test_acc = accs[2]
+        print('Epoch: {:03d}, Train Acc: {:.5f}, '
+              'Val Acc: {:.5f}, Test Acc: {:.5f}'.format(epoch, train_acc,
+                                                         val_acc, test_acc))
+
+    visualization_nodembs(dataset, model)
