@@ -43,12 +43,15 @@ class GRNN(nn.Module):
     #def __init__(self, pyg_graph):   
     def __init__(self, data, sequence_path_length=32, gnn_hidden_size=128, node_embed_size=64, lstm_hidden_size=32, conv_l=3):
         super().__init__()
+        
         self.gnn = GCN(in_channels=data.x.shape[1], #num features, 
                        hidden_channels=gnn_hidden_size, 
                        num_layers=conv_l, 
                        out_channels=node_embed_size)
+        
         self.batch_norm_lstm = nn.BatchNorm1d(sequence_path_length)
         self.batch_norm_linear = nn.BatchNorm1d(lstm_hidden_size)
+        
         self.lstm_in_size = node_embed_size
 
 
@@ -59,7 +62,11 @@ class GRNN(nn.Module):
         self.pred_head = nn.Linear(lstm_hidden_size, data.x.shape[0]) #num nodes)
 
     def forward(self, data, indices):
-        print("merdone nel forward")
+        
+        # print("merdone nel forward")
+        breakpoint()
+        # print(data.size())
+        # print(data)
 
         x , edge_index = data.x, data.edge_index
 
@@ -72,17 +79,19 @@ class GRNN(nn.Module):
         predictions = self.pred_head(h_n)
         return F.log_softmax(predictions, dim=1)
     
-def train(data, conv_layer, writer,  epochs):
-    test_loader = loader =  DataLoader(dataset, batch_size = 64, shuffle = True)
+def train(dataset, conv_layer, writer,  epochs):
+    
+    test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
 
     # Build model
-    model = GRNN(data=data, 
+    model = GRNN(data=dataset.data, 
                 sequence_path_length=32, 
                 gnn_hidden_size=128, 
                 node_embed_size=64,
                 lstm_hidden_size=32,
                 conv_l=3)
     opt = optim.Adam(model.parameters(), lr = 0.01)
+    loss_fn = nn.NLLLoss()
     
     test_accuracies = []
 
@@ -95,15 +104,18 @@ def train(data, conv_layer, writer,  epochs):
         for batch in loader:
             # breakpoint()
             opt.zero_grad()
-            embedding, pred = model(batch, np.arange(0,100))
+            embedding, pred = model(batch, batch.train_mask)
             label = batch.y
         
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
                 
-            loss = model.loss(pred, label)
+            loss = loss_fn(pred, label)
+            
             loss.backward()
+            
             opt.step()
+            
             total_loss += loss.item() * batch.num_graphs
         total_loss /= len(loader.dataset)
         # tensorboard
@@ -167,5 +179,5 @@ if __name__ == '__main__':
 
     print("li mortacci tua: ", dataset.data)
 
-    model = train(dataset.data, conv_layer, writer, epochs)   
+    model = train(dataset, conv_layer, writer, epochs)   
     
