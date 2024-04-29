@@ -6,7 +6,7 @@
     # 1. Apply a shared linear transformation to all nodes
     # 2. Self attention e_ij = a(W * h_i, W * h_j) specifies the importance of node j's features to node i
     # 3. Normalize the attention scores using the softmax function
-    # 4. the attention mechanism a is a single layer feedforward neural network
+    # 4. the attention mechanism 'a' is a single layer feedforward neural network
         # activation function: LeakyReLU
         # output layer: softmax
     # 5. Massage passing
@@ -62,13 +62,13 @@ class GATConv(nn.Module):
         self.W = nn.Parameter(torch.zeros(size=(in_channels, out_channels)))
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
         
-        self.a = nn.Parameter(torch.zeros(size=(2*out_channels, 1)))
+        self.a = nn.Parameter(torch.zeros(size=(1, 2*out_channels)))
         nn.init.xavier_uniform_(self.a.data, gain=1.414)
         
         # LeakyReLU
         self.leakyrelu = nn.LeakyReLU(self.alpha)
     
-    # TODO: fix the forward function
+    
     def forward(self, x, edge_index):
         
         # Linear Transformation
@@ -79,20 +79,34 @@ class GATConv(nn.Module):
         # Attention Mechanism
         a_input = torch.cat([wh[edge_index[0]], wh[edge_index[1]]], dim=1)
         # print("Shape of a_input before attention:", a_input.shape)
-        e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(dim = 1))
+        # e = self.leakyrelu(self.a @ a_input.t())
+        e = self.leakyrelu((self.a * a_input).sum(dim=1, keepdim=True))
         # print("Shape of e after LeakyReLU:", e.shape)
         
         # Masked Attention
+        # zero_vec is used to mask out the elements that should be ignored during the attention calculation.
         zero_vec = -9e15*torch.ones_like(e)
+        # masking out the elements that should be ignored during the attention calculation.
         attention = torch.where(e > 0, e, zero_vec)
         
-        # print("attention", attention.shape)
-        # breakpoint()
+        
         attention = F.softmax(attention, dim=0)
         # attention = F.dropout(attention, self.dropout, training=self.training)
         
+        # print("Shape of attention after softmax:", attention.shape)
+        # print("Shape of wh after attention:", wh.shape)
+        # breakpoint()
         # h_prime = torch.matmul(attention, wh)
-        h_prime = torch.matmul(attention.unsqueeze(0).repeat(wh.size(0), 1).T, wh)
+        
+        # Manual feature aggregation
+        h_prime = torch.zeros_like(wh)
+        # Gather contributions from source nodes to target nodes
+        for i in range(wh.size(0)):
+            # Find edges where the current node is the target
+            mask = (edge_index[1] == i)
+            if mask.any():
+                # Aggregate the weighted features
+                h_prime[i] = (attention[mask] * wh[edge_index[0][mask]]).sum(dim=0)
         
         if self.concat:
             return F.elu(h_prime)
@@ -135,7 +149,7 @@ class GAT(nn.Module):
         
         x = F.elu(x)
         
-        return F.log_softmax(x, dim=0)
+        return F.log_softmax(x, dim=1)
 
 def train(dataset, conv_layer, writer,  epochs, anti_symmetric =True):
     test_loader = loader =  DataLoader(dataset, batch_size = 1, shuffle = True)
@@ -147,9 +161,10 @@ def train(dataset, conv_layer, writer,  epochs, anti_symmetric =True):
     loss_fn = nn.NLLLoss()
     test_accuracies = []
     
-    print("#"*20 + f" Running GAT, with {str(epochs)} epochs, {str(conv_layer)} convs" + "#"*20)
+    print("#"*20 + f" Running GAT, with {str(epochs)} epochs, {str(conv_layer)} convs " + "#"*20)
 
     for epoch in range(0,epochs):
+        print("Epoch", epoch)
         total_loss = 0
         model.train()
         
