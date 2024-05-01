@@ -38,6 +38,9 @@ from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
 
+# For proposition proving
+from scipy.linalg import eig
+
 torch.manual_seed(42)
 np.random.seed(42)
 
@@ -47,7 +50,7 @@ class ADGNConv(pyg_nn.MessagePassing):
                  out_channels: int,
                  gamma: float = 0.1, 
                  epsilon : float = 0.1, 
-                 antisymmetry = True,
+                 antisymmetry = False,
                  ):
         super(ADGNConv, self).__init__(aggr='add') # "Add" aggregation (can alternatively use mean or max)
         self.in_channels = in_channels
@@ -83,9 +86,13 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Antisymmetric formulation (paper formula 5)
         W = ((self.Weights - self.Weights.T) - (self.gamma * self.Identity)) if self.antisymmetry else self.Weights
         
+        self.curr_W = W
+        
         # Convolution of neighbors of previous layer PHI*(X(l-1), N_u)
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
+        
+        
         # breakpoint()
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
         row, col = edge_index
@@ -96,15 +103,39 @@ class ADGNConv(pyg_nn.MessagePassing):
         norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
         
         aggr_x = self.propagate(edge_index, x = aggr_x, norm=norm)
-        
+        self.curr_aggr_x = aggr_x
         
         # Store previous x
         x_prev = x
         
         # Apply function of paper in the forward pass
         x = (x_prev @ W + aggr_x + self.bias)
+        inter_x = self.act_func(x)[0]
         x = self.epsilon*(self.act_func(x))
         x = x_prev + x
+        
+        def jacobian_fun(x_in):
+            return self.act_func(x_in @ self.curr_W + self.curr_aggr_x[0] + self.bias)
+        
+        y = jacobian_fun(x_prev[0])
+        
+        # print("e1 giusto facccia da pollo", x[0] == y)
+        print("sanity check", inter_x == y)
+        
+        
+        # Perform the Jacobian
+        print(f"here, inter_x is {(inter_x.size())}")
+        # jacobian = torch.autograd.functional.jacobian(facciadapollo, x_prev[0])
+        jacobian = torch.autograd.functional.jacobian(jacobian_fun, inter_x)
+        print(jacobian.size())   
+        print(type(jacobian))
+        jacobian = jacobian.numpy()
+        print(jacobian.shape)
+        eigenvalues, _ = eig(jacobian)
+        real_part = eigenvalues.real
+        print(real_part)
+        print(np.sum(real_part))
+        breakpoint()     
         
         return x
     
@@ -117,6 +148,7 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Here we add outselves back in
         # breakpoint()
         return norm.view(-1, 1) * x_j
+
 
 class ADGN(nn.Module):
     def __init__(self, in_channels, hidden_dim, out_channels, num_layers, epsilon = 0.1, gamma = 0.1, antisymmetric = True):
