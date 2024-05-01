@@ -118,8 +118,11 @@ class GGNN(torch.nn.Module):
                        out_dim= dataset.num_classes)
 
     def forward(self):
+        #print("1, data shape:", data.shape)
         x = self.conv(data)
+        print("2, x after conv shape:", x.shape)
         x = self.mlp(x)
+        print("3, x after mlp shape:", x.shape)
         return F.log_softmax(x, dim=-1)
 
 # def train():
@@ -137,10 +140,10 @@ class GGNN(torch.nn.Module):
 #         accs.append(acc)
 #     return accs
 
-def train(dataset, epochs=100):
+def train(dataset, epochs=100, num_conv=3):
     start_time = time.time()
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
-    model = GGNN(in_channels=500, out_channels=500).to(device)
+    model = GGNN(in_channels=500, out_channels=500, num_conv=num_conv).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     loss_fn = nn.CrossEntropyLoss()
 
@@ -148,7 +151,7 @@ def train(dataset, epochs=100):
 
     best_acc = [0,0,0]
 
-    print("#" * 20 + f" Running Gated GNN, with {str(epochs)} epochs, {None} convs" + "#" * 20)
+    print("#" * 20 + f" Running Gated GNN, with {str(epochs)} epochs, {str(num_conv)} convs" + "#" * 20)
 
     for epoch in range(1, epochs+1):
         print(f'Processing Epoch {epoch}', end="\r")
@@ -244,7 +247,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     epochs = args.epoch
-    model = train(dataset, epochs=epochs)
+    convs = args.conv
+
+    model = train(dataset, epochs=epochs, num_conv=convs)
 
     model.__repr__()
     #visualization_nodembs(dataset, model)
