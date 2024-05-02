@@ -39,6 +39,8 @@ import matplotlib.pyplot as plt
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
+from scipy.linalg import eig
+
 torch.manual_seed(42)
 np.random.seed(42)
 
