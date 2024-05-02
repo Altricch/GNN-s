@@ -52,7 +52,7 @@ class ADGNConv(pyg_nn.MessagePassing):
         out_channels: int,
         gamma: float = 0.1,
         epsilon: float = 0.1,
-        antisymmetry=False,
+        antisymmetry=True,
     ):
         super(ADGNConv, self).__init__(
             aggr="add"
@@ -119,31 +119,35 @@ class ADGNConv(pyg_nn.MessagePassing):
 
         # Apply function of paper in the forward pass
         x = x_prev @ W + aggr_x + self.bias
+
+        # For sanity check comparison
         inter_x = self.act_func(x)[0]
+
+        # Skip Connection and Epsilon
         x = self.epsilon * (self.act_func(x))
         x = x_prev + x
 
+        #Paper Claim Function
         def jacobian_fun(x_in):
             return self.act_func(x_in @ self.curr_W + self.curr_aggr_x[0] + self.bias)
 
-        y = jacobian_fun(x_prev[0])
+        node_check = x_prev[0]
+        y = jacobian_fun(node_check)
 
-        # print("e1 giusto facccia da pollo", x[0] == y)
-        print("sanity check", inter_x == y)
+        #print("sanity check", inter_x == y)
 
         # Perform the Jacobian
         jacobian = torch.autograd.functional.jacobian(jacobian_fun, inter_x).numpy()
+        # Extract Eigen Values
         eigenvalues, _ = eig(jacobian)
+        # Obtain Real Part
         real_part = eigenvalues.real
-        breakpoint()
-        if not np.any(real_part > 0):
-            print("sanity check passed")
-        else:
-            raise ValueError("Should be non-positive for all eigenvalues of Jacobian matrix")
-            
-            
-        print(f"real part of Jacobian matrix is\n {real_part}")
 
+        if np.any(real_part > 0):
+            #print("sanity check failed")
+            print(f"Real Part of eigenvalues of Jacobian matrix is:\n {real_part}")
+            raise ValueError("[FAILED JACOBIAN TEST]\n Should be non-positive for all eigenvalues of Jacobian matrix")
+              
         return x
 
     def message(self, x_j, norm):
@@ -164,7 +168,7 @@ class ADGN(nn.Module):
         num_layers,
         epsilon=0.1,
         gamma=0.1,
-        antisymmetric=True,
+        antisymmetry=True,
     ):
         super(ADGN, self).__init__()
 
@@ -173,7 +177,7 @@ class ADGN(nn.Module):
         self.out_channels = out_channels
         self.epsilon = epsilon
         self.gamma = gamma
-        self.antisymmetric = antisymmetric
+        self.antisymmetry = antisymmetry
 
         self.emb = None
         if self.hidden_dim is not None:
@@ -188,6 +192,7 @@ class ADGN(nn.Module):
                     ADGNConv(
                         in_channels=self.hidden_dim,
                         out_channels=self.hidden_dim,
+                        antisymmetry=antisymmetry
                     )
                 )
             )
@@ -244,7 +249,7 @@ def visualization_nodembs(dataset, model):
     plt.show()
 
 
-def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
+def train(dataset, conv_layer, writer, epochs, antisymmetry=True):
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
     # print("LOADER IS", loader)
 
@@ -255,7 +260,7 @@ def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
         32,
         dataset.num_classes,
         num_layers=conv_layer,
-        antisymmetric=anti_symmetric,
+        antisymmetry=antisymmetry,
     )
     opt = optim.Adam(model.parameters(), lr=0.01)
     loss_fn = nn.CrossEntropyLoss()
@@ -263,7 +268,7 @@ def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
 
     print(
         "#" * 20
-        + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {model.antisymmetric} "
+        + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {model.antisymmetry} "
         + "#" * 20
     )
 
@@ -277,9 +282,6 @@ def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
             opt.zero_grad()
             emb, pred = model(batch)
             label = batch.y
-
-            # print("batch mask", np.where(batch.train_mask == True))
-            # print(pred[batch.train_mask])
 
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
@@ -308,6 +310,7 @@ def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
 
 
 def test(loader, model, is_validation=False):
+    global test_counter
     model.eval()
 
     correct = 0
@@ -326,6 +329,8 @@ def test(loader, model, is_validation=False):
         correct += pred.eq(label).sum().item()
 
     else:
+        test_counter+=1 #DEBUG
+
         total = 0
         for data in loader.dataset:
             total += torch.sum(data.test_mask).item()
@@ -338,28 +343,20 @@ import argparse
 parser = argparse.ArgumentParser(description="Process some inputs.")
 parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
 parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
-parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", default=1)
+parser.add_argument("--asym", type=int, help="Use AntiSymmetric Weights", default=1)
 
 if __name__ == "__main__":
-
-    # args = parser.parse_args()
+    args = parser.parse_args()
+    test_counter = 0
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
-    # model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2, antisymmetric=args.asym)
-    # print(model)
-    # emb,x = dataset
-    # print(model(x).shape)
-
-    args = parser.parse_args()
 
     epochs = args.epoch
     conv_layer = args.conv
     antisymmetry = True if args.asym == 1 else False
     print(antisymmetry)
-    model = train(dataset, conv_layer, writer, epochs, anti_symmetric=antisymmetry)
+    model = train(dataset, conv_layer, writer, epochs, antisymmetry=antisymmetry)
+    print("[DEBUG] test counter:", test_counter)
     visualization_nodembs(dataset, model)
-
-
-# TODO: Why multiple times per hidden layer (e.g. num_iterations not clear)
