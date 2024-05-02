@@ -17,23 +17,8 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
 import time
-
 torch.manual_seed(42)
 
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = "cpu"
-
-dataset = 'PubMed'
-transform = T.Compose([T.TargetIndegree(),
-])
-path = osp.join('data', dataset)
-dataset = Planetoid(path, dataset, transform=transform)
-
-#dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
-data = dataset[0]
-
-print(data)
 
 class MLP(nn.Module):
     def __init__(self, input_dim, hid_dims, out_dim):
@@ -45,6 +30,7 @@ class MLP(nn.Module):
             self.mlp.add_module('lay_{}'.format(i),nn.Linear(in_features=dims[i], out_features=dims[i+1]))
             if i+2 < len(dims):
                 self.mlp.add_module('act_{}'.format(i), nn.Tanh())
+
     def reset_parameters(self):
         for i, l in enumerate(self.mlp):
             if type(l) == nn.Linear:
@@ -52,7 +38,6 @@ class MLP(nn.Module):
 
     def forward(self, x):
         return self.mlp(x)
-
 
 #BASE Class for information propagation and update amongst nodes
 class GatedGraphConv(MessagePassing):
@@ -140,18 +125,17 @@ class GGNN(torch.nn.Module):
 #         accs.append(acc)
 #     return accs
 
-def train(dataset, epochs=100, num_conv=3):
+def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
+    ###### SETUP ######
     start_time = time.time()
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
     model = GGNN(in_channels=500, out_channels=500, num_conv=num_conv).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
     loss_fn = nn.CrossEntropyLoss()
-
     tot_loss = 0
-
     best_acc = [0,0,0]
-
     print("#" * 20 + f" Running Gated GNN, with {str(epochs)} epochs, {str(num_conv)} convs" + "#" * 20)
+    ####################
 
     for epoch in range(1, epochs+1):
         print(f'Processing Epoch {epoch}', end="\r")
@@ -236,6 +220,19 @@ parser = argparse.ArgumentParser(description='Process some inputs.')
 parser.add_argument('--epoch', type=int, help='Epoch Amount', default=100)
 parser.add_argument('--conv', type=int, help='Conv Amount', default=3)
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = "cpu"
+
+dataset = 'PubMed'
+transform = T.Compose([T.TargetIndegree(),
+])
+path = osp.join('data', dataset)
+dataset = Planetoid(path, dataset, transform=transform)
+
+#dataset = Planetoid(root='/tmp/PubMed', name = 'PubMed')
+data = dataset[0]
+
+print("[DATA],", data)
 
 if __name__ == '__main__':
 
@@ -249,7 +246,11 @@ if __name__ == '__main__':
     epochs = args.epoch
     convs = args.conv
 
-    model = train(dataset, epochs=epochs, num_conv=convs)
-
+    model = train(dataset, epochs=epochs, num_conv=convs, learning_rate=0.001)
     model.__repr__()
+
     #visualization_nodembs(dataset, model)
+
+        #TODO:
+    # Check mlp layer amount with respect to other models 
+    # check conv connections as the dimensions of the conv are |19k x 500|
