@@ -240,7 +240,7 @@ def train(dataset, conv_layer, writer,  epochs, lr = 0.01, hidden_layer = 32, an
         if writer is not None:
             writer.add_scalar("Loss", total_loss, epoch)
         
-        if epoch % 1 == 0:
+        if epoch % 10 == 0:
             test_acc = test(test_loader, model)
             test_accuracies.append(test_acc)
             print("Epoch {}. Loss {:.4f}. Test accuracy {:.4f}".format(epoch, total_loss, test_acc))
@@ -298,7 +298,7 @@ def hyperparameter_search():
         for lr in learning_rates: 
             for lay in hidden_layers:
                 
-                model, best_accuracy = train(dataset, conv, writer=None, epochs=1, lr= lr, hidden_layer=lay)   
+                model, best_accuracy = train(dataset, conv, writer=None, epochs=100, lr= lr, hidden_layer=lay)   
                 
                 if all_best_acc<best_accuracy:
                     all_best_lr = lr

@@ -64,7 +64,7 @@ class GATConv(nn.Module):
         self.W = nn.Parameter(torch.zeros(size=(in_channels, out_channels)))
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
 
-        self.a = nn.Parameter(torch.zeros(size=(1, 2 * out_channels)))
+        self.a = nn.Parameter(torch.zeros(size=(2 * out_channels, 1)))
         nn.init.xavier_uniform_(self.a.data, gain=1.414)
 
         # LeakyReLU
@@ -74,11 +74,18 @@ class GATConv(nn.Module):
 
         # Linear Transformation
         # breakpoint()
-        wh = torch.mm(x, self.W)
+        breakpoint()
+        z = torch.mm(x, self.W)
 
         # Attention Mechanism
-        a_input = torch.cat([wh[edge_index[0]], wh[edge_index[1]]], dim=1)
-        # print("Shape of a_input before attention:", a_input.shape)
+        # a_input = torch.cat([z[edge_index[0]], z[edge_index[1]]], dim=1)
+        N = x.shape[0]
+        breakpoint()
+        pluto = z.repeat(N, 1)
+        pippo = z.repeat(1, N).view(N * N, -1)
+        a_input = torch.cat([pippo, pluto], dim=1)
+        # a_input = torch.cat([z.repeat(1, N).view(N * N, -1), z.repeat(N, 1)], dim=1).view(N, -1, 2 * self.out_features)
+        print("Shape of a_input before attention:", a_input.shape)
         # e = self.leakyrelu(self.a @ a_input.t())
         e = self.leakyrelu((self.a * a_input).sum(dim=1, keepdim=True))
         # print("Shape of e after LeakyReLU:", e.shape)
@@ -96,16 +103,16 @@ class GATConv(nn.Module):
         # print("Shape of wh after attention:", wh.shape)
         # breakpoint()
         # h_prime = torch.matmul(attention, wh)
-
+        breakpoint()
         # Manual feature aggregation
-        h_prime = torch.zeros_like(wh)
+        h_prime = torch.zeros_like(z)
         # Gather contributions from source nodes to target nodes
-        for i in range(wh.size(0)):
+        for i in range(z.size(0)):
             # Find edges where the current node is the target
             mask = edge_index[1] == i
             if mask.any():
                 # Aggregate the weighted features
-                h_prime[i] = (attention[mask] * wh[edge_index[0][mask]]).sum(dim=0)
+                h_prime[i] = (attention[mask] * z[edge_index[0][mask]]).sum(dim=0)
 
         if self.concat:
             return F.elu(h_prime)
