@@ -148,6 +148,7 @@ class ADGNConv(pyg_nn.MessagePassing):
         
         # Extract the real part of the eigenvalues
         eigenvalues, _ = eig(jacobian)
+        # Obtain Real Part
         real_part = eigenvalues.real
         
         # Get the max eigenvalue
@@ -177,7 +178,7 @@ class ADGN(nn.Module):
         num_layers,
         epsilon=0.1,
         gamma=0.1,
-        antisymmetric=True,
+        antisymmetry=True,
     ):
         super(ADGN, self).__init__()
 
@@ -186,7 +187,7 @@ class ADGN(nn.Module):
         self.out_channels = out_channels
         self.epsilon = epsilon
         self.gamma = gamma
-        self.antisymmetric = antisymmetric
+        self.antisymmetry = antisymmetry
 
         self.emb = None
         if self.hidden_dim is not None:
@@ -261,7 +262,7 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, anti_symmetric=True):
         hidden_dim,
         dataset.num_classes,
         num_layers=conv_layer,
-        antisymmetric=anti_symmetric,
+        antisymmetry=antisymmetry,
     )
     
     opt = optim.Adam(model.parameters(), lr=0.01)
@@ -270,7 +271,7 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, anti_symmetric=True):
 
     print(
         "#" * 20
-        + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {model.antisymmetric} "
+        + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {model.antisymmetry} "
         + "#" * 20
     )
 
@@ -311,6 +312,7 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, anti_symmetric=True):
 
 
 def test(loader, model, is_validation=False):
+    global test_counter
     model.eval()
 
     correct = 0
@@ -329,6 +331,8 @@ def test(loader, model, is_validation=False):
         correct += pred.eq(label).sum().item()
 
     else:
+        test_counter+=1 #DEBUG
+
         total = 0
         for data in loader.dataset:
             total += torch.sum(data.test_mask).item()
