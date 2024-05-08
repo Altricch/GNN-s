@@ -114,7 +114,7 @@ class ADGNConv(pyg_nn.MessagePassing):
         # breakpoint()
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
         row, col = edge_index
-        # breakpoint()
+
         deg = pyg_utils.degree(row, aggr_x.size()[0])
         deg_inv_sqrt = deg.pow(-0.5)
         # Formula 7 of paper
@@ -202,7 +202,7 @@ class ADGN(nn.Module):
                     ADGNConv(
                         in_channels=self.hidden_dim,
                         out_channels=self.hidden_dim,
-                        antisymmetry=self.antisymmetric,
+                        antisymmetry=self.antisymmetry,
                     )
                 )
             )
@@ -249,7 +249,7 @@ def visualization_nodembs(dataset, model):
     plt.show()
 
 
-def train(dataset, conv_layer, hidden_dim, writer, epochs, anti_symmetric=True):
+def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
     
     global iter
     
@@ -348,7 +348,7 @@ def plot_eigenvalues():
     ax.set_ylim(-0.5, 3)
     plt.savefig('max_eigenvalues.png')
     plt.show()
-    
+
 
 ### Flags Areas ###
 import argparse
@@ -376,8 +376,8 @@ if __name__ == "__main__":
         conv_layer = args.conv
         hidden_dim = args.hidden
         antisymmetry = True if args.asym == 1 else False
-        model = train(dataset, conv_layer, hidden_dim, writer, epochs, anti_symmetric=antisymmetry)
-        model = train(dataset, conv_layer, hidden_dim, writer, epochs, anti_symmetric=False)
+        model = train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=antisymmetry)
+        model = train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=False)
         # visualization_nodembs(dataset, model)
         
         # Store the list in a dataframe

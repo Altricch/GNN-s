@@ -124,7 +124,6 @@ class ADGNConv(pyg_nn.MessagePassing):
         # x_j has shape [E, outchannels]
 
         # Here we add outselves back in
-        # breakpoint()
         return norm.view(-1, 1) * x_j
 
 
@@ -137,7 +136,7 @@ class ADGN(nn.Module):
         num_layers,
         epsilon=0.1,
         gamma=0.1,
-        antisymmetric=True,
+        antisymmetry=True,
     ):
         super(ADGN, self).__init__()
 
@@ -146,7 +145,7 @@ class ADGN(nn.Module):
         self.out_channels = out_channels
         self.epsilon = epsilon
         self.gamma = gamma
-        self.antisymmetric = antisymmetric
+        self.antisymmetry = antisymmetry
 
         self.emb = None
         if self.hidden_dim is not None:
@@ -161,6 +160,7 @@ class ADGN(nn.Module):
                     ADGNConv(
                         in_channels=self.hidden_dim,
                         out_channels=self.hidden_dim,
+                        antisymmetry=self.antisymmetry,
                     )
                 )
             )
@@ -180,7 +180,7 @@ class ADGN(nn.Module):
             emb = x
 
         x = self.linear(x)
-        # print("X is", x.)
+
         return emb, x
 
 
@@ -190,25 +190,13 @@ def visualization_nodembs(dataset, model):
     embs = []
     colors = []
     for batch in loader:
-        # print("batch is", batch)
         emb, pred = model(batch)
-        # print(emb.shape)
         embs.append(emb)
 
-        # for elem in batch.y:
-        # print(elem)
         colors += [color_list[y] for y in batch.y]
     embs = torch.cat(embs, dim=0)
 
     xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
-    # print("xs shape is", xs)
-    # print("ys shape is", len(xs))
-
-    # max_distance = calculate_diameter(xs, ys)
-    # eccentricity = calculate_eccentricity(xs, ys)
-
-    # print(f"Max distance: {max_distance}")
-    # print(f"Eccentricity: {eccentricity}")
 
     plt.scatter(xs, ys, color=colors)
     plt.title(
@@ -217,19 +205,19 @@ def visualization_nodembs(dataset, model):
     plt.show()
 
 
-def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
+def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
-    # print("LOADER IS", loader)
 
     # Build model
     # self, in_channels, hidden_dim, out_channels, num_layers
     model = ADGN(
         max(dataset.num_node_features, 1),
-        32,
+        hidden_dim,
         dataset.num_classes,
         num_layers=conv_layer,
-        antisymmetric=anti_symmetric,
+        antisymmetry=antisymmetry,
     )
+
     opt = optim.Adam(model.parameters(), lr=0.01)
     loss_fn = nn.CrossEntropyLoss()
     test_accuracies = []
@@ -245,14 +233,9 @@ def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
         model.train()
 
         for batch in loader:
-            # print(model(batch)[0])
-            # breakpoint()
             opt.zero_grad()
             emb, pred = model(batch)
             label = batch.y
-
-            # print("batch mask", np.where(batch.train_mask == True))
-            # print(pred[batch.train_mask])
 
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
@@ -262,6 +245,7 @@ def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
             opt.step()
             total_loss += loss.item() * batch.num_graphs
         total_loss /= len(loader.dataset)
+
         # tensorboard
         writer.add_scalar("Loss", total_loss, epoch)
 
@@ -311,6 +295,7 @@ import argparse
 parser = argparse.ArgumentParser(description="Process some inputs.")
 parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
 parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
+parser.add_argument("--hidden", type=int, help="Hidden Layer", default=32)
 parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", default=1)
 
 if __name__ == "__main__":
@@ -320,16 +305,14 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
-    # model = ADGN(max(dataset.num_node_features, 1), 32, dataset.num_classes, 2, antisymmetric=args.asym)
-    # print(model)
-    # emb,x = dataset
-    # print(model(x).shape)
 
     args = parser.parse_args()
 
     epochs = args.epoch
     conv_layer = args.conv
+    hidden_dim = args.hidden
     antisymmetry = True if args.asym == 1 else False
-    print(antisymmetry)
-    model = train(dataset, conv_layer, writer, epochs, anti_symmetric=antisymmetry)
+    model = train(
+        dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=antisymmetry
+    )
     visualization_nodembs(dataset, model)
