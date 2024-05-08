@@ -1,5 +1,7 @@
 
 # from paper: GATED GRAPH SEQUENCE NEURAL NETWORKS
+# The biggest modification of GNNs is that the authors use Gated Recurrent Units (Cho et al., 2014) and unroll the recurrence
+# for a fixed number of steps T and use backpropagation through time in order to compute gradients.
 
 import os
 import os.path as osp
@@ -48,31 +50,35 @@ class GatedGraphConv(MessagePassing):
         edge_index = data.edge_index
         edge_weight = data.edge_attr
 
-        #breakpoint()
+        breakpoint()
 
         if x.size(-1) > self.out_channels:
             raise ValueError('The number of input channels is not allowed to '
                              'be larger than the number of output channels')
 
+        # Create padding in case input is smaller than output
         if x.size(-1) < self.out_channels:
             zero = x.new_zeros(x.size(0), self.out_channels - x.size(-1))
             x = torch.cat([x, zero], dim=1)
 
+
         for i in range(self.num_layers):
             m = torch.matmul(x, self.weight[i])
 
-            #breakpoint()
+            # Propagation model based on point 3.2 of paper
             m = self.propagate(edge_index, x=m, edge_weight=edge_weight,
                                size=None)
             x = self.rnn(m, x)
 
         return x
 
-    #def message(self, x_j, edge_weight):
+    # def message(self, x_j, edge_weight):
+    #    print("Message passing")
     #    return x_j if edge_weight is None else edge_weight.view(-1, 1) * x_j
 
     # def message_and_aggregate(self, adj_t, x):
-    #     return matmul(adj_t, x, reduce=self.aggr)
+    #     print("message passing and aggregating")
+    #     return torch.matmul(adj_t, x, reduce=self.aggr)
 
     def __repr__(self):
         return '{}({}, num_layers={})'.format(self.__class__.__name__,
@@ -85,6 +91,7 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
 
         self.mlp = nn.Sequential()
+        # List of dimensions 
         dims = [input_dim] + hid_dims
         for i in range(len(dims)-1):
             self.mlp.add_module('lay_{}'.format(i),nn.Linear(in_features=dims[i], out_features=dims[i+1]))
@@ -99,6 +106,7 @@ class MLP(nn.Module):
     def forward(self, x):
         return self.mlp(x)
 #endregion
+
 #region GGNN
 class GGNN(torch.nn.Module):
     def __init__(self, in_channels, out_channels=None, num_conv=3, hidden_dim = 32, aggr = 'add', mlp_hdim=32, mlp_hlayers=3):
@@ -123,16 +131,15 @@ class GGNN(torch.nn.Module):
 
 
     def forward(self, data):
-        #print("0, x forward shape:", data.x.shape)
-        x = self.emb(data.x) # Linear reduction
-        #print("1, x after emb shape:", x.shape)
-        x = self.conv(x)
-        #print("2, x after conv shape:", x.shape)
+
+        x = self.emb(data.x) # Linear Encoding / Feature Reduction
+
+        x = self.conv(x) # Propagation and GRU
+
         x = self.mlp(x)
-        #print("3, x after mlp shape:", x.shape)
-        x_emb = self.out_layer(x)
-        #print("4, x after out shape:", x_emb.shape)
-        #x_emb
+ 
+        x_emb = self.out_layer(x) # Linear Decoding
+
         return x_emb, F.log_softmax(x_emb, dim=-1)
 #endregion 
 
@@ -147,7 +154,7 @@ def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
     best_acc = [0,0,0]
 
     print("#"*100+"\n")
-    print("[MODEL REPR]", repr(model))
+    print("[MODEL REPRESENTATION]", repr(model))
     print("#" * 20 + f" Running Gated GNN, with {str(epochs)} epochs, {str(num_conv)} convs " + "#" * 20)
     ####################
 
@@ -248,6 +255,8 @@ data = dataset[0]
 
 print("[DATA],", data)
 
+
+# region Execution
 if __name__ == '__main__':
 
     test_dataset = dataset[:len(dataset) // 10]
@@ -266,4 +275,5 @@ if __name__ == '__main__':
 
     #TODO:
     # ADD LINER REDUCTION to 32 [DONE]
-    # ADD droput to prevent Overfitting
+    # ADD droput to prevent Overfitting [NotNecessary]
+#endregion
