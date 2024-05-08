@@ -1,4 +1,5 @@
 # https://www.youtube.com/watch?v=CwsPoa7z2c8
+# https://github.com/Altricch/GNN-s/blob/main/Train/GAT.py
 
 # GAT = Graph Attention Network --> let to learn automatically the importance of each node in the graph
 
@@ -46,78 +47,90 @@ import matplotlib.pyplot as plt
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
+# GATConv from torch_geometric
+from torch_geometric.nn import GATConv
+
 import argparse
 
+# region: GATConv old
+# class GATConv(nn.Module):
+#     def __init__(self, in_channels, out_channels, heads, 
+#                 negative_slope = 0.2, dropout=0.6, concat=True):
+        
+#         super(GATConv, self).__init__()
 
-class GATConv(nn.Module):
-    def __init__(self, in_channels, out_channels, dropout=0.6, alpha=0.2, concat=True):
-        super(GATConv, self).__init__()
+#         self.dropout = dropout
+#         self.in_features = in_channels
+#         self.out_features = out_channels
+#         self.heads = heads
+#         self.negative_slope = negative_slope # LeakyReLU
+#         self.concat = concat  # concat = True for all layers except the output layer
 
-        self.dropout = dropout
-        self.in_features = in_channels
-        self.out_features = out_channels
-        self.alpha = alpha  # LeakyReLU with negative input slope, alpha = 0.2
-        self.concat = concat  # conacat = True for all layers except the output layer.
+#         # Xavier Initialization of Weights
+#         # self.W = nn.Parameter(torch.zeros(size=(in_channels, self.heads * out_channels)))
+#         self.W = nn.Parameter(torch.Tensor(in_channels, heads * out_channels))
+#         self.a = nn.Parameter(torch.Tensor(1, heads, 2 * out_channels))
+#         # nn.init.xavier_uniform_(self.W.data, gain=1.414)
 
-        # Xavier Initialization of Weights
-        # Alternatively use weights_init to apply weights of choice
-        self.W = nn.Parameter(torch.zeros(size=(in_channels, out_channels)))
-        nn.init.xavier_uniform_(self.W.data, gain=1.414)
+#         # Attention Weights
+#         # self.a = nn.Parameter(torch.zeros(size=(1, heads, 2 * out_channels)))
+#         # nn.init.xavier_uniform_(self.a.data, gain=1.414)
+#         self.reset_parameters()
+        
+#         # LeakyReLU
+#         self.leakyrelu = nn.LeakyReLU(self.negative_slope)
+    
+#     def reset_parameters(self):
+#         init.xavier_uniform_(self.W)
+#         init.xavier_uniform_(self.a)
 
-        self.a = nn.Parameter(torch.zeros(size=(2 * out_channels, 1)))
-        nn.init.xavier_uniform_(self.a.data, gain=1.414)
+#     def forward(self, x, edge_index):
 
-        # LeakyReLU
-        self.leakyrelu = nn.LeakyReLU(self.alpha)
-
-    def forward(self, x, edge_index):
-
-        # Linear Transformation
-        # breakpoint()
-        breakpoint()
-        z = torch.mm(x, self.W)
-
-        # Attention Mechanism
-        # a_input = torch.cat([z[edge_index[0]], z[edge_index[1]]], dim=1)
-        N = x.shape[0]
-        breakpoint()
-        pluto = z.repeat(N, 1)
-        pippo = z.repeat(1, N).view(N * N, -1)
-        a_input = torch.cat([pippo, pluto], dim=1)
-        # a_input = torch.cat([z.repeat(1, N).view(N * N, -1), z.repeat(N, 1)], dim=1).view(N, -1, 2 * self.out_features)
-        print("Shape of a_input before attention:", a_input.shape)
-        # e = self.leakyrelu(self.a @ a_input.t())
-        e = self.leakyrelu((self.a * a_input).sum(dim=1, keepdim=True))
-        # print("Shape of e after LeakyReLU:", e.shape)
-
-        # Masked Attention
-        # zero_vec is used to mask out the elements that should be ignored during the attention calculation.
-        zero_vec = -9e15 * torch.ones_like(e)
-        # masking out the elements that should be ignored during the attention calculation.
-        attention = torch.where(e > 0, e, zero_vec)
-
-        attention = F.softmax(attention, dim=0)
-        # attention = F.dropout(attention, self.dropout, training=self.training)
-
-        # print("Shape of attention after softmax:", attention.shape)
-        # print("Shape of wh after attention:", wh.shape)
-        # breakpoint()
-        # h_prime = torch.matmul(attention, wh)
-        breakpoint()
-        # Manual feature aggregation
-        h_prime = torch.zeros_like(z)
-        # Gather contributions from source nodes to target nodes
-        for i in range(z.size(0)):
-            # Find edges where the current node is the target
-            mask = edge_index[1] == i
-            if mask.any():
-                # Aggregate the weighted features
-                h_prime[i] = (attention[mask] * z[edge_index[0][mask]]).sum(dim=0)
-
-        if self.concat:
-            return F.elu(h_prime)
-        else:
-            return h_prime
+#         # Linear Transformation
+#         # x = torch.mm(x, self.W)
+#         # # breakpoint()
+#         # # 
+#         # wh1 = torch.matmul(x, self.a[:self.out_features, :])
+#         # wh2 = torch.matmul(x, self.a[self.out_features:, :])
+        
+#         # # 
+#         # e = self.leakyrelu(wh1 + wh2.T)
+        
+#         # # 
+#         # attention = F.softmax(e, dim=1)
+        
+#         # # 
+#         # # attention = F.softmax(e, dim=1)
+        
+#         # # 
+#         # h_prime = torch.matmul(attention, x)
+        
+#         # # 
+#         # if self.concat:
+#         #     return F.elu(h_prime)
+#         # else:
+#         #     return h_prime
+#         # breakpoint()
+#         x = torch.mm(x, self.W).view(-1, self.heads, self.out_features)
+#         edge_index_i, edge_index_j = edge_index
+        
+#         # Calculate attention coefficients
+#         x_i = x[edge_index_i]
+#         x_j = x[edge_index_j]
+        
+#         a_input = torch.cat([x_i, x_j], dim=-1).unsqueeze(0) * self.a
+        
+#         e = self.leakyrelu(a_input).sum(dim=-1)
+        
+#         alpha = F.softmax(e, dim=1)
+        
+#         out = (x_j * alpha.unsqueeze(-1)).sum(dim=1)
+        
+#         if self.concat:
+#             return out.view(-1, self.heads * self.out_features)
+#         else:
+#             return out.mean(dim=1)
+# endregion 
 
 
 class GAT(nn.Module):
@@ -126,9 +139,8 @@ class GAT(nn.Module):
         in_channels,
         out_channels,
         hidden_dim,
-        n_layers,
+        heads=5,
         dropout=0.6,
-        alpha=0.2,
         concat=True,
     ):
         super(GAT, self).__init__()
@@ -136,58 +148,49 @@ class GAT(nn.Module):
         self.n_features = in_channels
         self.n_classes = out_channels
         self.n_hidden = hidden_dim
-        self.n_layers = n_layers
+        self.n_heads = heads
         self.dropout = dropout
-        self.alpha = alpha
         self.concat = concat
 
         self.emb = nn.Linear(in_channels, hidden_dim)
-
-        self.layers = nn.ModuleList()
-        for _ in range(1, n_layers):
-            self.layers.append(
-                GATConv(
-                    hidden_dim,
-                    hidden_dim,
-                )
-            )
-
-        # Output layer
-        self.out_att = nn.Linear(hidden_dim, out_channels)
+        
+        self.conv1 = GATConv(hidden_dim, hidden_dim, heads=self.n_heads, dropout=dropout, concat=self.concat)
+        self.conv2 = GATConv(hidden_dim * heads, out_channels, heads=self.n_heads, dropout=dropout, concat=False)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
 
         x = self.emb(x)
 
-        for layer in self.layers:
-            x = layer(x, edge_index)
-
-        x = self.out_att(x)
-
-        x = F.elu(x)
-
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        
+        x = F.elu(self.conv1(x, edge_index))
+        
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        
+        x = self.conv2(x, edge_index)
+        
         return F.log_softmax(x, dim=1)
 
 
-def train(dataset, conv_layer, writer, epochs, anti_symmetric=True):
+def train(dataset, hidden_dim, writer, epochs, heads):
+    
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
-    # input_dim, hidden_dim, out_dim
-    model = GAT(dataset.num_node_features, dataset.num_classes, 32, conv_layer)
-    opt = optim.Adam(model.parameters(), lr=0.01)
+    # input_dim, output_dim, hidden_dim, num_heads
+    model = GAT(dataset.num_node_features, dataset.num_classes, hidden_dim, heads)
+    opt = optim.Adam(model.parameters(), lr=0.003)
     loss_fn = nn.NLLLoss()
     test_accuracies = []
 
     print(
         "#" * 20
-        + f" Running GAT, with {str(epochs)} epochs, {str(conv_layer)} convs "
+        + f" Running GAT, with {str(epochs)} epochs, {str(heads)} heads "
         + "#" * 20
     )
 
     for epoch in range(0, epochs):
-        print("Epoch", epoch)
         total_loss = 0
         model.train()
 
@@ -253,8 +256,8 @@ def test(loader, model, is_validation=False):
 ### Flags Areas ###
 parser = argparse.ArgumentParser(description="Process some inputs.")
 parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
-parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
-parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", default=1)
+parser.add_argument("--hidden", type=int, help="Hidden Dimension", default=10)
+parser.add_argument("--heads", type=int, help="Use number of heads", default=30)
 
 
 if __name__ == "__main__":
@@ -263,5 +266,7 @@ if __name__ == "__main__":
     # Node classification
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
-    conv_layer = args.conv
-    model = train(dataset, conv_layer, writer, args.epoch)
+    heads = args.heads
+    epochs = args.epoch
+    hidden_dim = args.hidden
+    model = train(dataset, hidden_dim, writer, epochs, heads)
