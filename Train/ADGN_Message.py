@@ -1,4 +1,3 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
@@ -55,7 +54,6 @@ class ADGNConv(pyg_nn.MessagePassing):
             aggr="add"
         )  # "Add" aggregation (can alternatively use mean or max)
 
-        # Variables definition
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.gamma = gamma
@@ -102,8 +100,6 @@ class ADGNConv(pyg_nn.MessagePassing):
 
         # Compute the degree of each node
         deg = pyg_utils.degree(row, aggr_x.size()[0])
-
-        # Inverse square root of degree
         deg_inv_sqrt = deg.pow(-0.5)
 
         # Formula 7 of paper, normalization
@@ -112,7 +108,6 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Propagate messages via aggregation function
         aggr_x = self.propagate(edge_index, x=aggr_x, norm=norm)
 
-        # Store previous x
         x_prev = x
 
         # Apply function of paper in the forward pass
@@ -141,7 +136,6 @@ class ADGN(nn.Module):
     ):
         super(ADGN, self).__init__()
 
-        # Variables definition
         self.in_channels = in_channels
         self.hidden_dim = hidden_dim
         self.out_channels = out_channels
@@ -194,28 +188,22 @@ class ADGN(nn.Module):
         return emb, x
 
 
+# Clustering the node embeddings
 def visualization_nodembs(dataset, model):
-    # Color list for visualization
-    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
 
-    # Data loader definition
+    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
     loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
-    # Embeddings and colors list
     embs = []
     colors = []
 
     for batch in loader:
-        # Get embeddings and predictions
-        emb, pred = model(batch)
 
-        # Sppend embeddings
+        emb, pred = model(batch)
         embs.append(emb)
 
-        # Collect the colors based on the ground truth
         colors += [color_list[y] for y in batch.y]
 
-    # Concatenate embeddings
     embs = torch.cat(embs, dim=0)
 
     # Get 2D representation of embeddings
@@ -229,9 +217,9 @@ def visualization_nodembs(dataset, model):
     plt.show()
 
 
+# Train the model
 def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
 
-    # Data loader definition
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
@@ -244,11 +232,9 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         antisymmetry=antisymmetry,
     )
 
-    # Define optimizer and loss function
     opt = optim.Adam(model.parameters(), lr=0.01)
     loss_fn = nn.CrossEntropyLoss()
 
-    # Accuracies list
     test_accuracies = []
 
     print(
@@ -263,26 +249,20 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
 
         for batch in loader:
 
-            # Reset gradients
             opt.zero_grad()
 
-            # Forward pass
             emb, pred = model(batch)
 
-            # Extract the labels
             label = batch.y
 
             # Filter training mask and labels only for node classification
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Compute loss
             loss = loss_fn(pred, label)
 
-            # Backward pass
             loss.backward()
 
-            # Update the model weights
             opt.step()
 
             # Accumulate the loss
@@ -312,19 +292,18 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
     return model
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
-            # Get the embeddings and predictions
+
             emb, pred = model(data)
 
-            # Get the class with the highest probability
             pred = pred.argmax(dim=1)
 
-            # Get the label from the ground truth
             label = data.y
 
         # Get the mask for the validation or test set
@@ -334,13 +313,11 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Compute the number of correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
-            # Number of nodes in the validation or test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
@@ -356,11 +333,8 @@ parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", defau
 
 if __name__ == "__main__":
 
-    # Set the device
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    # Set the writer for tensorboard
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
-    # Load the dataset
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
 
     # Parse the arguments and run the training

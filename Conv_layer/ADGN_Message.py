@@ -1,4 +1,3 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
@@ -58,6 +57,7 @@ class ADGNConv(pyg_nn.MessagePassing):
         super(ADGNConv, self).__init__(
             aggr="add"
         )  # "Add" aggregation (can alternatively use mean or max)
+        
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.gamma = gamma
@@ -100,14 +100,12 @@ class ADGNConv(pyg_nn.MessagePassing):
 
         # Add self loops to edge index
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
-        
+
         # Split edge index into row and column
         row, col = edge_index
 
         # Calculate the degree of each node
         deg = pyg_utils.degree(row, aggr_x.size()[0])
-
-        # Inverse square root of the degree
         deg_inv_sqrt = deg.pow(-0.5)
 
         # Formula 7 of paper, normalization
@@ -116,7 +114,6 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Apply message passing by aggregating neighbors
         aggr_x = self.propagate(edge_index, x=aggr_x, norm=norm)
 
-        # Store previous x
         x_prev = x
 
         # Apply the function of the paper
@@ -145,7 +142,6 @@ class ADGN(nn.Module):
     ):
         super(ADGN, self).__init__()
 
-        # Variables definition
         self.in_channels = in_channels
         self.hidden_dim = hidden_dim
         self.out_channels = out_channels
@@ -198,10 +194,10 @@ class ADGN(nn.Module):
         return emb, x
 
 
+# Train the model
 def train(
     dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32, anti_symmetric=True
 ):
-    # Data loader definition
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build the model
@@ -214,11 +210,9 @@ def train(
         antisymmetric=anti_symmetric,
     )
 
-    # Define optimizer and loss function
     opt = optim.Adam(model.parameters(), lr=lr)
     loss_fn = nn.CrossEntropyLoss()
 
-    # Accuracy list
     test_accuracies = []
 
     print(
@@ -232,26 +226,19 @@ def train(
         model.train()
 
         for batch in loader:
-            # Reset gradients
+
             opt.zero_grad()
 
-            # Forward pass
             emb, pred = model(batch)
-
-            # Extract labels
             label = batch.y
 
-            # Filter training mask and labels
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Calculate loss
             loss = loss_fn(pred, label)
 
-            # Backward pass
             loss.backward()
 
-            # Update model weights
             opt.step()
 
             # Accumulate loss
@@ -280,19 +267,18 @@ def train(
     return model, mean_avg_accuracy
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
-            # Forward pass
+
             emb, pred = model(data)
 
-            # Get the class with the highest probability
             pred = pred.argmax(dim=1)
 
-            # Extract the label from the ground truth
             label = data.y
 
         # Get the mask for the validation or test set
@@ -302,27 +288,23 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Count correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
-            # Total number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
-
+# Grid search for hyperparameters
 def hyperparameter_search():
-    # Variables definition to store best hyperparameters
+
     all_best_acc = float("-inf")
     all_best_lr = 0
     all_best_hidden = 0
 
-    # Get the current filename
     current_filename = os.path.abspath(__file__).split("/")[-1]
 
-    # Dictionary to store the best hyperparameters
     configs = {}
 
     # Possible hyperparameters
@@ -330,7 +312,6 @@ def hyperparameter_search():
     learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
     hidden_layers = [4, 8, 12, 24, 48, 64, 128]
 
-    # Load the dataset
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
 
     for conv in convs:

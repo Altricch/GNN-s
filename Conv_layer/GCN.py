@@ -1,4 +1,3 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
@@ -46,14 +45,11 @@ class GCN(nn.Module):
     def __init__(self, input_dim, hidden_dim, out_dim, conv_layers=2, doutrate=0.4):
         super().__init__()
 
-        # Dropout rate
         self.doutrate = doutrate
-
-        # Number of convolutional layers
         self.conv_layers = conv_layers
 
         self.best_accuracy = -1
-        
+
         # Module list for convolutional layers
         self.convs = nn.ModuleList()
         self.convs.append(self.build_conv_model(input_dim, hidden_dim))
@@ -67,7 +63,6 @@ class GCN(nn.Module):
             nn.Linear(hidden_dim, out_dim),
         )
 
-        # Number of total layers
         self.num_layers = self.conv_layers + 1
 
     # Build convolutional blocks
@@ -88,11 +83,10 @@ class GCN(nn.Module):
         for i in range(self.num_layers):
             # Input to GCN is (node features (|V|, F_in), edge indices (2,E))
             # Output: node features (|V|, F_out)
-            
+
             # Call the convolutional layer
             x = self.convs[i](x, edge_index)
 
-            # Store the embedding
             emb = x
 
             # Apply activation function and dropout
@@ -111,9 +105,9 @@ class GCN(nn.Module):
         return F.nll_loss(pred, label)
 
 
+# Train the model
 def train(dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32):
 
-    # Data loader definition
     test_loader = loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     # Build the model
@@ -124,10 +118,8 @@ def train(dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32):
         conv_layers=conv_layer,
     )
 
-    # Define optimizer
     opt = optim.Adam(model.parameters(), lr=lr)
 
-    # Accuracy list
     test_accuracies = []
 
     print(
@@ -148,26 +140,20 @@ def train(dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32):
         model.train()
 
         for batch in loader:
-            # Reset gradients
+
             opt.zero_grad()
 
-            # Forward pass
             embedding, pred = model(batch)
-
-            # Extract labels
             label = batch.y
 
             # Filter training mask and labels
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Calculate loss
             loss = model.loss(pred, label)
 
-            # Backward pass
             loss.backward()
 
-            # Model update weights
             opt.step()
 
             # Accumulate loss
@@ -201,19 +187,17 @@ def train(dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32):
     return model, mean_avg_accuracy
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
-            # Forward pass
             embeddings, pred = model(data)
 
-            # Get the class with highest probability
             pred = pred.argmax(dim=1)
 
-            # Get the label from the ground truth
             label = data.y
 
         # Get the mask for the validation or test set
@@ -223,28 +207,24 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Count correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
-            # Total number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
 
+# Hyperparameter search
 def conv():
 
-    # Variables to store the best accuracy and hyperparameters
     all_best_acc = float("-inf")
     all_best_lr = 0
     all_best_hidden = 0
 
-    # Get the current filename
     current_filename = os.path.abspath(__file__).split("/")[-1]
 
-    # Configs dictionary to store the best hyperparameters
     configs = {}
 
     # Tensorboard writer
@@ -265,7 +245,6 @@ def conv():
         all_best_lr = 0
         all_best_hidden = 0
 
-        # Iterate over the hyperparameters
         for lr in learning_rates:
             for lay in hidden_layers:
 

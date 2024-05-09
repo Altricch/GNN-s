@@ -1,11 +1,10 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
 # !pip install torch-geometric
 # !pip install tensorboardX
 
-import numpy as np 
+import numpy as np
 import pandas as pd
 import seaborn as sns
 import os
@@ -63,12 +62,11 @@ class ADGNConv(pyg_nn.MessagePassing):
         epsilon: float = 0.1,
         antisymmetry=True,
     ):
-        
+
         super(ADGNConv, self).__init__(
             aggr="add"
         )  # "Add" aggregation (can alternatively use mean or max)
-        
-        # Variables definition
+
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.gamma = gamma
@@ -116,14 +114,11 @@ class ADGNConv(pyg_nn.MessagePassing):
 
         # Add self loops to the edge index
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
-        
-        # Split edge index into rows and columns
+
         row, col = edge_index
 
         # Calculate the degree of the nodes
         deg = pyg_utils.degree(row, aggr_x.size()[0])
-        
-        # Calculate the inverse square root of the degree
         deg_inv_sqrt = deg.pow(-0.5)
 
         # Formula 7 of paper, Normalization
@@ -133,7 +128,6 @@ class ADGNConv(pyg_nn.MessagePassing):
         aggr_x = self.propagate(edge_index, x=aggr_x, norm=norm)
         self.curr_aggr_x = aggr_x
 
-        # Store previous x
         x_prev = x
 
         # Apply function of paper in the forward pass
@@ -197,7 +191,6 @@ class ADGN(nn.Module):
     ):
         super(ADGN, self).__init__()
 
-        # Variables definition
         self.in_channels = in_channels
         self.hidden_dim = hidden_dim
         self.out_channels = out_channels
@@ -229,7 +222,7 @@ class ADGN(nn.Module):
         self.linear = nn.Linear(self.hidden_dim, self.out_channels)
 
     def forward(self, x):
-        
+
         # Get the node features and edge index
         x, edge_idx = (
             x.x,
@@ -250,31 +243,24 @@ class ADGN(nn.Module):
         return emb, x
 
 
+# Cluster the node embeddings
 def visualization_nodembs(dataset, model):
-    
-    # Colors for the nodes
+
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-    
-    # Data loader definition
+
     loader = DataLoader(dataset, batch_size=1, shuffle=False)
-    
-    # Embeddings and colors lists
+
     embs = []
     colors = []
-    
-    
+
     for batch in loader:
-        
-        # Get the embeddings and the predictions (forward pass)
+
         emb, pred = model(batch)
 
-        # Append the embeddings
         embs.append(emb)
 
-        # Collect the colors based on the ground truth
         colors += [color_list[y] for y in batch.y]
-    
-    # Concatenate the embeddings
+
     embs = torch.cat(embs, dim=0)
 
     # Get the 2D representation of the embeddings
@@ -288,12 +274,12 @@ def visualization_nodembs(dataset, model):
     plt.show()
 
 
+# Train the model
 def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
 
     # Global variable to keep track of the epoch
     global iter
 
-    # Data loader
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
@@ -306,11 +292,9 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         antisymmetry=antisymmetry,
     )
 
-    # Define optimizer and loss function
     opt = optim.Adam(model.parameters(), lr=0.01)
     loss_fn = nn.CrossEntropyLoss()
-    
-    # Accuracy list
+
     test_accuracies = []
 
     print(
@@ -324,31 +308,25 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         model.train()
         iter = epoch
         for batch in loader:
-            # Reset gradients
             opt.zero_grad()
-            
-            # Get the embeddings and the predictions (forward pass)
+
             emb, pred = model(batch)
-            
-            # Extract the labels
+
             label = batch.y
 
             # Filter training mask and labels only for node classification
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Compute the loss
             loss = loss_fn(pred, label)
-            
-            # Backward pass
+
             loss.backward()
-            
-            # Update the model weights
+
             opt.step()
-            
+
             # Accumulate the loss
             total_loss += loss.item() * batch.num_graphs
-        
+
         # Average loss
         total_loss /= len(loader.dataset)
 
@@ -373,19 +351,17 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
     return model
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
-            # Get the embeddings and the predictions (forward pass)
             emb, pred = model(data)
-            
-            # Get the class with the highest probability
+
             pred = pred.argmax(dim=1)
-            
-            # Get the label from the ground truth
+
             label = data.y
 
         # Filter the mask for validation or test set
@@ -395,29 +371,29 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Compute the number of correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
 
         total = 0
         for data in loader.dataset:
-            # Number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
 
 # Plot the max eigenvalues
-def plot_eigenvalues():
-    # Read the data from the csv file
-    data = pd.read_csv("max_eigenvalues.csv")
-    
-    # Define the plot, set the limits and save the plot
+def plot_eigenvalues(path):
+
+    data = pd.read_csv(path)
+
     fig, ax = plt.subplots()
     sns.lineplot(data=data, ax=ax)
     plt.axhline(0, color="black", linewidth=1)
     ax.set_ylim(-0.5, 3)
-    plt.savefig("max_eigenvalues.png")
+    plt.title("Max Eigenvalues of Jacobian Matrix")
+    plt.ylabel("Max Eigenvalue")
+    plt.xlabel("Epoch")
+    plt.savefig(os.path.join(os.getcwd(), "Jacobian/max_eigenvalues.png"))
     plt.show()
 
 
@@ -432,19 +408,17 @@ parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", defau
 
 if __name__ == "__main__":
 
-    # Set the device
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    
-    # Set the writer and load the dataset
+
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
 
     args = parser.parse_args()
 
     # Check if the csv file exists
-    csv_path = os.path.exists(os.path.join(os.getcwd(), "Jacobian/max_eigenvalues.csv"))
-    if csv_path:
-        plot_eigenvalues()
+    csv_path = os.path.join(os.getcwd(), "Jacobian/max_eigenvalues.csv")
+    if os.path.exists(csv_path):
+        plot_eigenvalues(csv_path)
 
     else:
         # Otherwise, train the model with the given hyperparameters

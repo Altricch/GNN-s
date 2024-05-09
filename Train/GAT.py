@@ -1,4 +1,3 @@
-
 # GAT = Graph Attention Network --> let to learn automatically the importance of each node in the graph
 
 # Graph attention layer
@@ -50,6 +49,7 @@ from torch_geometric.nn import GATConv
 
 import argparse
 
+
 class GAT(nn.Module):
     def __init__(
         self,
@@ -62,7 +62,6 @@ class GAT(nn.Module):
     ):
         super(GAT, self).__init__()
 
-        # Variables definition
         self.n_features = in_channels
         self.n_classes = out_channels
         self.n_hidden = hidden_dim
@@ -72,50 +71,58 @@ class GAT(nn.Module):
 
         # Linear transformation from input to hidden
         self.emb = nn.Linear(self.n_features, self.n_hidden)
-        
-        # GAT layer from hidden to hidden 
-        self.conv1 = GATConv(self.n_hidden, self.n_hidden, heads=self.n_heads, dropout=self.dropout, concat=self.concat)
-        
+
+        # GAT layer from hidden to hidden
+        self.conv1 = GATConv(
+            self.n_hidden,
+            self.n_hidden,
+            heads=self.n_heads,
+            dropout=self.dropout,
+            concat=self.concat,
+        )
+
         # GATConv from hidden to output
-        self.conv2 = GATConv(self.n_hidden * self.n_heads, self.n_classes, heads=self.n_heads, dropout=self.dropout, concat=False)
+        self.conv2 = GATConv(
+            self.n_hidden * self.n_heads,
+            self.n_classes,
+            heads=self.n_heads,
+            dropout=self.dropout,
+            concat=False,
+        )
 
     def forward(self, data):
-        
+
         # Get the node features and edge index
         x, edge_index = data.x, data.edge_index
 
         # Apply the linear transformation
         x = self.emb(x)
-        
-        # Apply the dropout
+
         x = F.dropout(x, p=self.dropout, training=self.training)
-        
+
         # Apply the GAT layer 1 and the activation function
         x = F.elu(self.conv1(x, edge_index))
-        
-        # Apply the dropout
+
         x = F.dropout(x, p=self.dropout, training=self.training)
 
         # Apply the GAT layer 2
         x = self.conv2(x, edge_index)
-        
+
         return F.log_softmax(x, dim=1)
 
 
+# Train the model
 def train(dataset, hidden_dim, writer, epochs, heads):
-    
-    # Data loader
+
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
     # input_dim, output_dim, hidden_dim, num_heads
     model = GAT(dataset.num_node_features, dataset.num_classes, hidden_dim, heads)
-    
-    # Define the optimizer and the loss function
+
     opt = optim.Adam(model.parameters(), lr=0.003)
     loss_fn = nn.NLLLoss()
-    
-    # Accuracy list
+
     test_accuracies = []
 
     print(
@@ -129,10 +136,9 @@ def train(dataset, hidden_dim, writer, epochs, heads):
         model.train()
 
         for batch in loader:
-            # Reset the gradients
+
             opt.zero_grad()
-            
-            # forward pass
+
             pred = model(batch)
             label = batch.y
 
@@ -140,21 +146,17 @@ def train(dataset, hidden_dim, writer, epochs, heads):
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Calculate the loss
             loss = loss_fn(pred, label)
 
-            # Backward pass
             loss.backward()
 
-            # Update the model weights
             opt.step()
 
             # Accumulate the loss
             total_loss += loss.item() * batch.num_graphs
-        
-        # Average loss
+
         total_loss /= len(loader.dataset)
-        
+
         # Write the loss to tensorboard
         writer.add_scalar("Loss", total_loss, epoch)
 
@@ -176,17 +178,18 @@ def train(dataset, hidden_dim, writer, epochs, heads):
     return model
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
-            # Forward pass
+
             pred = model(data)
-            # Get the class with the highest probability
+
             pred = pred.argmax(dim=1)
-            # Get the label from the ground truth
+
             label = data.y
 
         # # Get the mask for the validation or test set
@@ -196,13 +199,11 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Calculate the number of correctly classified nodes
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
-            # Total number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
@@ -215,9 +216,9 @@ parser.add_argument("--heads", type=int, help="Use number of heads", default=30)
 
 
 if __name__ == "__main__":
-    # Parse the arguments
+    # Parse the arguments and run the model
     args = parser.parse_args()
-    # Node classification
+
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
     heads = args.heads

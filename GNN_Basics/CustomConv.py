@@ -1,4 +1,3 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
@@ -67,13 +66,10 @@ class CustomConv(pyg_nn.MessagePassing):
         # Compute messages
         # x_j has shape [E, outchannels]
 
-        # Split edge index into row and column
         row, col = edge_index
 
         # Calculate the degree of each node
         deg = pyg_utils.degree(row, size[0], dtype=x_j.dtype)
-
-        # Inverse square root of the degree
         deg_inv_sqrt = deg.pow(-0.5)
 
         # Normalization

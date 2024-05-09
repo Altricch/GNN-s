@@ -1,6 +1,6 @@
 # from paper: GATED GRAPH SEQUENCE NEURAL NETWORKS
-# "The biggest modification of GNNs is that the authors use Gated Recurrent Units 
-# (Cho et al., 2014) and unroll the recurrence for a fixed number of steps T 
+# "The biggest modification of GNNs is that the authors use Gated Recurrent Units
+# (Cho et al., 2014) and unroll the recurrence for a fixed number of steps T
 # and use backpropagation through time in order to compute gradients."
 
 import os
@@ -35,8 +35,9 @@ class GatedGraphConv(MessagePassing):
         self.num_layers = num_layers
 
         self.rnn = torch.nn.GRUCell(self.out_channels, self.out_channels, bias=bias)
-        self.weight = Param(Tensor(self.num_layers, self.out_channels, self.out_channels))
-        # self.rnn = torch.nn.GRUCell(out_channels, out_channels, bias=bias)
+        self.weight = Param(
+            Tensor(self.num_layers, self.out_channels, self.out_channels)
+        )
 
         self.reset_parameters()
 
@@ -45,7 +46,7 @@ class GatedGraphConv(MessagePassing):
         self.rnn.reset_parameters()
 
     def forward(self, x):
-        
+
         edge_index = data.edge_index
         edge_weight = data.edge_attr
 
@@ -154,7 +155,8 @@ class GGNN(torch.nn.Module):
 
 # endregion
 
-#region Training
+# region Training
+
 
 def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
     ###### SETUP ######
@@ -246,7 +248,8 @@ def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
 
     return model
 
-#endregion
+
+# endregion
 
 
 # region Visualisation

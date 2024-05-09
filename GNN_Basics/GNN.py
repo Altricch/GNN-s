@@ -1,4 +1,3 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
@@ -43,13 +42,8 @@ class GCN(nn.Module):
     ):
         super(GCN, self).__init__()
 
-        # Task: node or graph classification
         self.task = task
-
-        # Dropout rate
         self.doutrate = doutrate
-
-        # Number of convolutional layers
         self.conv_layers = conv_layers
 
         # Module list for convolutional layers
@@ -105,7 +99,6 @@ class GCN(nn.Module):
             # Call the convolutional layer
             x = self.convs[i](x, edge_index)
 
-            # Store the embedding
             emb = x
 
             # Apply activation function and dropout
@@ -128,6 +121,7 @@ class GCN(nn.Module):
         return F.nll_loss(pred, label)
 
 
+# Train the model
 def train(dataset, task, conv_layer, writer, epochs):
 
     # Based on the task we split the dataset
@@ -162,13 +156,10 @@ def train(dataset, task, conv_layer, writer, epochs):
 
         for batch in loader:
 
-            # Reset gradients
             opt.zero_grad()
 
-            # Forward pass
             embedding, pred = model(batch)
 
-            # Extract the labels
             label = batch.y
 
             # Filter training mask and labels only for node classification
@@ -176,13 +167,10 @@ def train(dataset, task, conv_layer, writer, epochs):
                 pred = pred[batch.train_mask]
                 label = label[batch.train_mask]
 
-            # Calculate loss
             loss = model.loss(pred, label)
 
-            # Backward pass
             loss.backward()
 
-            # Update model weights
             opt.step()
 
             # Accumulate loss
@@ -209,6 +197,7 @@ def train(dataset, task, conv_layer, writer, epochs):
     return model
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
@@ -216,13 +205,10 @@ def test(loader, model, is_validation=False):
     for data in loader:
         with torch.no_grad():
 
-            # Forward pass
             embeddings, pred = model(data)
 
-            # Get the class with highest probability
             pred = pred.argmax(dim=1)
 
-            # Get the label from the ground truth
             label = data.y
 
         if model.task == "node":
@@ -233,10 +219,8 @@ def test(loader, model, is_validation=False):
             pred = pred[mask]
             label = data.y[mask]
 
-        # Calculate the number of correct predictions
         correct += pred.eq(label).sum().item()
 
-    # Calculate the total number of nodes in the test set based on the task
     if model.task == "graph":
         total = len(loader.dataset)
     else:
@@ -246,29 +230,22 @@ def test(loader, model, is_validation=False):
     return correct / total
 
 
+# Cluster the node embeddings
 def visualization_nodembs(dataset, model):
 
-    # List of colors for the nodes
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-
-    # Load the dataset
     loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
-    # List to store the embeddings and colors/classes
     embs = []
     colors = []
 
     for batch in loader:
-        # Forward pass
         emb, pred = model(batch)
 
-        # Append the embeddings
         embs.append(emb)
 
-        # Collect the colors based on the ground truth
         colors += [color_list[y] for y in batch.y]
 
-    # Concatenate the embeddings
     embs = torch.cat(embs, dim=0)
 
     # Perform t-SNE to reduce the dimensionality to 2D

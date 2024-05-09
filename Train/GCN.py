@@ -1,4 +1,3 @@
-
 # !pip install torch-scatter
 # !pip install torch-cluster
 # !pip install torch-sparse
@@ -41,17 +40,16 @@ from torch_geometric.data import DataLoader
 class GCN(nn.Module):
     def __init__(self, input_dim, hidden_dim, out_dim, conv_layers=2, doutrate=0.4):
         super().__init__()
-        
+
         # Dropout and convolutional layers
         self.doutrate = doutrate
         self.conv_layers = conv_layers
-        
-        
+
         self.best_accuracy = -1
-        
+
         # Module list for convolutional layers
         self.convs = nn.ModuleList()
-        # Add first layer
+        # Add the first layer
         self.convs.append(self.build_conv_model(input_dim, hidden_dim))
         # Add the rest of the layers
         for i in range(conv_layers):
@@ -64,7 +62,6 @@ class GCN(nn.Module):
             nn.Linear(hidden_dim, out_dim),
         )
 
-        # Number of total layers
         self.num_layers = self.conv_layers + 1
 
     # Build convolutional blocks
@@ -75,7 +72,7 @@ class GCN(nn.Module):
     def forward(self, data):
         # Data consists of: data.x (feature matrix), data.edge_index (adjecency matrix, what are the edges),
         # data.batch (which node belongs to which graph)
-        
+
         # Get the feature matrix, edge index and batch
         x, edge_index, batch = data.x, data.edge_index, data.batch
 
@@ -87,13 +84,12 @@ class GCN(nn.Module):
         for i in range(self.num_layers):
             # Input to GCN is (node features (|V|, F_in), edge indices (2,E))
             # Output: node features (|V|, F_out)
-            
+
             # Apply the convolutional layer
             x = self.convs[i](x, edge_index)
-            
-            # Store the embedding
+
             emb = x
-            
+
             # Apply the activation function and dropout
             x = F.tanh(x)
             x = F.dropout(x, p=self.doutrate, training=self.training)
@@ -110,9 +106,9 @@ class GCN(nn.Module):
         return F.nll_loss(pred, label)
 
 
+# Train the model
 def train(dataset, conv_layer, writer, epochs):
-    
-    # Data loader definition
+
     test_loader = loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     # Build model
@@ -122,11 +118,8 @@ def train(dataset, conv_layer, writer, epochs):
         dataset.num_classes,
         conv_layers=conv_layer,
     )
-    
-    # Define the optimizer
-    opt = optim.Adam(model.parameters(), lr=0.01)
 
-    # Accuracy list
+    opt = optim.Adam(model.parameters(), lr=0.01)
     test_accuracies = []
 
     print(
@@ -145,32 +138,29 @@ def train(dataset, conv_layer, writer, epochs):
         model.train()
 
         for batch in loader:
-            # Reset the gradients
+
             opt.zero_grad()
-            
-            # Forward pass
+
             embedding, pred = model(batch)
+
             label = batch.y
 
             # Filter training mask and labels only for node classification
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Compute the loss
             loss = model.loss(pred, label)
-            
-            # Backward pass
+
             loss.backward()
-            
-            # Update the model weights
+
             opt.step()
-            
+
             # Accumulate the loss
             total_loss += loss.item() * batch.num_graphs
-        
+
         # Average loss
         total_loss /= len(loader.dataset)
-        
+
         # Write the loss to tensorboard
         writer.add_scalar("Loss", total_loss, epoch)
 
@@ -192,19 +182,18 @@ def train(dataset, conv_layer, writer, epochs):
     return model
 
 
+# Test the model
 def test(loader, model, is_validation=False):
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
-            # Forward pass
+
             embeddings, pred = model(data)
-            
-            # Get the class with the highest probability
+
             pred = pred.argmax(dim=1)
-            
-            # Get the label from the ground truth 
+
             label = data.y
 
         # Get the mask for the validation or test set
@@ -214,44 +203,37 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Calculate the number of correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
-            # Total number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
 
+# Cluster the node embeddings
 def visualization_nodembs(dataset, model):
-    # Color list
+
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-    
-    # dataloader
     loader = DataLoader(dataset, batch_size=64, shuffle=True)
-    
-    # Embeddings and colors list
+
     embs = []
     colors = []
-    
+
     for batch in loader:
-        # Forward pass
+
         emb, pred = model(batch)
-        
-        # Append the embeddings
+
         embs.append(emb)
-        
-        # Collect the colors based on the ground truth
+
         colors += [color_list[y] for y in batch.y]
-    
-    # Concatenate the embeddings
+
     embs = torch.cat(embs, dim=0)
 
     # Get the 2D representation of the embeddings
     xs, ys = zip(*TSNE().fit_transform(embs.detach().numpy()))
-    
+
     # Plot the 2D representation
     plt.scatter(xs, ys, color=colors)
     plt.title(
