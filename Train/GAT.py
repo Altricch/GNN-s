@@ -71,13 +71,13 @@ class GAT(nn.Module):
         self.concat = concat
 
         # Linear transformation from input to hidden
-        self.emb = nn.Linear(in_channels, hidden_dim)
+        self.emb = nn.Linear(self.n_features, self.n_hidden)
         
         # GAT layer from hidden to hidden 
-        self.conv1 = GATConv(hidden_dim, hidden_dim, heads=self.n_heads, dropout=dropout, concat=self.concat)
+        self.conv1 = GATConv(self.n_hidden, self.n_hidden, heads=self.n_heads, dropout=self.dropout, concat=self.concat)
         
         # GATConv from hidden to output
-        self.conv2 = GATConv(hidden_dim * heads, out_channels, heads=self.n_heads, dropout=dropout, concat=False)
+        self.conv2 = GATConv(self.n_hidden * self.n_heads, self.n_classes, heads=self.n_heads, dropout=self.dropout, concat=False)
 
     def forward(self, data):
         
@@ -86,7 +86,7 @@ class GAT(nn.Module):
 
         # Apply the linear transformation
         x = self.emb(x)
-
+        
         # Apply the dropout
         x = F.dropout(x, p=self.dropout, training=self.training)
         

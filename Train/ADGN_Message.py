@@ -152,7 +152,7 @@ class ADGN(nn.Module):
         # Linear layer for embedding from input to hidden dimension
         self.emb = None
         if self.hidden_dim is not None:
-            self.emb = nn.Linear(self.in_channels, hidden_dim, bias=False)
+            self.emb = nn.Linear(self.in_channels, self.hidden_dim, bias=False)
 
         # Module list for convolutions
         self.conv = nn.ModuleList()

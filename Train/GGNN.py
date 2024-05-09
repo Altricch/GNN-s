@@ -34,8 +34,8 @@ class GatedGraphConv(MessagePassing):
         self.out_channels = out_channels
         self.num_layers = num_layers
 
-        self.rnn = torch.nn.GRUCell(out_channels, out_channels, bias=bias)
-        self.weight = Param(Tensor(num_layers, out_channels, out_channels))
+        self.rnn = torch.nn.GRUCell(self.out_channels, self.out_channels, bias=bias)
+        self.weight = Param(Tensor(self.num_layers, self.out_channels, self.out_channels))
         # self.rnn = torch.nn.GRUCell(out_channels, out_channels, bias=bias)
 
         self.reset_parameters()
