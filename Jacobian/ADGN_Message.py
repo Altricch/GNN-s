@@ -1,4 +1,3 @@
-# https://www.youtube.com/watch?v=-UjytpbqX4A&t=2221s
 
 # !pip install torch-scatter
 # !pip install torch-cluster
@@ -6,7 +5,7 @@
 # !pip install torch-geometric
 # !pip install tensorboardX
 
-import numpy as np
+import numpy as np 
 import pandas as pd
 import seaborn as sns
 import os
@@ -47,11 +46,13 @@ from scipy.linalg import eig
 torch.manual_seed(42)
 np.random.seed(42)
 
-
+# List to store the max eigenvalues of the Jacobian matrix
 max_eigenvalues_list_true = []
 max_eigenvalues_list_false = []
 
+# Global variable to keep track of the epoch
 iter = 0
+
 
 class ADGNConv(pyg_nn.MessagePassing):
     def __init__(
@@ -62,9 +63,12 @@ class ADGNConv(pyg_nn.MessagePassing):
         epsilon: float = 0.1,
         antisymmetry=True,
     ):
+        
         super(ADGNConv, self).__init__(
             aggr="add"
         )  # "Add" aggregation (can alternatively use mean or max)
+        
+        # Variables definition
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.gamma = gamma
@@ -93,11 +97,10 @@ class ADGNConv(pyg_nn.MessagePassing):
         init.uniform_(self.bias, -bound, bound)
         self.linear.reset_parameters()
 
-
     def forward(self, x, edge_index):
-        
+
         global iter
-        
+
         # Antisymmetric formulation (paper formula 5)
         W = (
             ((self.Weights - self.Weights.T) - (self.gamma * self.Identity))
@@ -111,15 +114,22 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
 
-        # breakpoint()
+        # Add self loops to the edge index
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        
+        # Split edge index into rows and columns
         row, col = edge_index
 
+        # Calculate the degree of the nodes
         deg = pyg_utils.degree(row, aggr_x.size()[0])
+        
+        # Calculate the inverse square root of the degree
         deg_inv_sqrt = deg.pow(-0.5)
-        # Formula 7 of paper
+
+        # Formula 7 of paper, Normalization
         norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
 
+        # Propagate the messages via aggregation function
         aggr_x = self.propagate(edge_index, x=aggr_x, norm=norm)
         self.curr_aggr_x = aggr_x
 
@@ -128,39 +138,44 @@ class ADGNConv(pyg_nn.MessagePassing):
 
         # Apply function of paper in the forward pass
         x = x_prev @ W + aggr_x + self.bias
-        
+
         # For sanity check
         inter_x = self.act_func(x)[iter]
-        
+
         # Skip Connection and Epsilon scaling
         x = self.epsilon * (self.act_func(x))
         x = x_prev + x
 
         # Paper claims that the Jacobian matrix should be non-positive
         def jacobian_fun(x_in):
-            return self.act_func(x_in @ self.curr_W + self.curr_aggr_x[iter] + self.bias)
-        
-        
+            return self.act_func(
+                x_in @ self.curr_W + self.curr_aggr_x[iter] + self.bias
+            )
+
         y = jacobian_fun(x_prev[iter])
 
         # Perform the Jacobian
         jacobian = torch.autograd.functional.jacobian(jacobian_fun, inter_x).numpy()
-        
+
         # Extract the real part of the eigenvalues
         eigenvalues, _ = eig(jacobian)
+
         # Obtain Real Part
         real_part = eigenvalues.real
-        
-        # Get the max eigenvalue
+
+        # Get the max eigenvalue and store it
         if self.antisymmetry:
             max_eigenvalues_list_true.append(np.max(real_part))
         else:
             max_eigenvalues_list_false.append(np.max(real_part))
-        
-        # breakpoint()
+
+        # Check if the Jacobian matrix is non-positive for all eigenvalues of the Jacobian matrix
+        # If not, raise an error
         if np.any(real_part > 0) and self.antisymmetry:
-            raise ValueError("[FAILED JACOBIAN TEST]\nShould be non-positive for all eigenvalues of Jacobian matrix")
-        
+            raise ValueError(
+                "[FAILED JACOBIAN TEST]\nShould be non-positive for all eigenvalues of Jacobian matrix"
+            )
+
         return x
 
     def message(self, x_j, norm):
@@ -182,6 +197,7 @@ class ADGN(nn.Module):
     ):
         super(ADGN, self).__init__()
 
+        # Variables definition
         self.in_channels = in_channels
         self.hidden_dim = hidden_dim
         self.out_channels = out_channels
@@ -189,10 +205,12 @@ class ADGN(nn.Module):
         self.gamma = gamma
         self.antisymmetry = antisymmetry
 
+        # Embedding layer (Linear Layer) to reduce the dimensionality of the input to the hidden dimension
         self.emb = None
         if self.hidden_dim is not None:
             self.emb = nn.Linear(self.in_channels, hidden_dim, bias=False)
 
+        # Module list for the convolutional layers
         self.conv = nn.ModuleList()
 
         # Apply hidden dimensions in conv block
@@ -207,41 +225,62 @@ class ADGN(nn.Module):
                 )
             )
 
+        # Linear layer to map the hidden dimension to the output dimension
         self.linear = nn.Linear(self.hidden_dim, self.out_channels)
 
     def forward(self, x):
+        
+        # Get the node features and edge index
         x, edge_idx = (
             x.x,
             x.edge_index,
         )
 
+        # Apply the embedding layer (Linear Layer)
         x = self.emb(x)
 
+        # Apply the convolutional layers
         for conv in self.conv:
             x = conv(x, edge_idx)
             emb = x
 
+        # Apply the linear layer
         x = self.linear(x)
 
         return emb, x
 
 
 def visualization_nodembs(dataset, model):
+    
+    # Colors for the nodes
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
+    
+    # Data loader definition
     loader = DataLoader(dataset, batch_size=1, shuffle=False)
+    
+    # Embeddings and colors lists
     embs = []
     colors = []
+    
+    
     for batch in loader:
-
+        
+        # Get the embeddings and the predictions (forward pass)
         emb, pred = model(batch)
 
+        # Append the embeddings
         embs.append(emb)
 
+        # Collect the colors based on the ground truth
         colors += [color_list[y] for y in batch.y]
+    
+    # Concatenate the embeddings
     embs = torch.cat(embs, dim=0)
 
+    # Get the 2D representation of the embeddings
     xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
 
+    # Plot the 2D representation of the embeddings
     plt.scatter(xs, ys, color=colors)
     plt.title(
         f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%, symmetry {model.antisymmetry}"
@@ -250,9 +289,11 @@ def visualization_nodembs(dataset, model):
 
 
 def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
-    
+
+    # Global variable to keep track of the epoch
     global iter
-    
+
+    # Data loader
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
@@ -264,9 +305,12 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         num_layers=conv_layer,
         antisymmetry=antisymmetry,
     )
-    
+
+    # Define optimizer and loss function
     opt = optim.Adam(model.parameters(), lr=0.01)
     loss_fn = nn.CrossEntropyLoss()
+    
+    # Accuracy list
     test_accuracies = []
 
     print(
@@ -280,22 +324,38 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         model.train()
         iter = epoch
         for batch in loader:
+            # Reset gradients
             opt.zero_grad()
+            
+            # Get the embeddings and the predictions (forward pass)
             emb, pred = model(batch)
+            
+            # Extract the labels
             label = batch.y
 
+            # Filter training mask and labels only for node classification
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
+            # Compute the loss
             loss = loss_fn(pred, label)
+            
+            # Backward pass
             loss.backward()
+            
+            # Update the model weights
             opt.step()
+            
+            # Accumulate the loss
             total_loss += loss.item() * batch.num_graphs
-        total_loss /= len(loader.dataset)
         
-        # tensorboard
+        # Average loss
+        total_loss /= len(loader.dataset)
+
+        # Write the loss to tensorboard
         writer.add_scalar("Loss", total_loss, epoch)
 
+        # Evaluate the model every 10 epochs on the test set
         if epoch % 10 == 0:
             test_acc = test(test_loader, model)
             test_accuracies.append(test_acc)
@@ -304,49 +364,60 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
                     epoch, total_loss, test_acc
                 )
             )
+            # Best accuracy so far
             model.best_accuracy = max(test_accuracies)
             print("best accuracy is", max(test_accuracies))
+            # Write the test accuracy to tensorboard
             writer.add_scalar("test accuracy", test_acc, epoch)
 
     return model
 
 
 def test(loader, model, is_validation=False):
-    global test_counter
     model.eval()
 
     correct = 0
     for data in loader:
         with torch.no_grad():
+            # Get the embeddings and the predictions (forward pass)
             emb, pred = model(data)
+            
+            # Get the class with the highest probability
             pred = pred.argmax(dim=1)
+            
+            # Get the label from the ground truth
             label = data.y
 
+        # Filter the mask for validation or test set
         mask = data.val_mask if is_validation else data.test_mask
 
         # Node classification: only evaluate in test set
         pred = pred[mask]
         label = data.y[mask]
 
+        # Compute the number of correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
-        test_counter+=1 #DEBUG
 
         total = 0
         for data in loader.dataset:
+            # Number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
 
 # Plot the max eigenvalues
 def plot_eigenvalues():
-    data = pd.read_csv('max_eigenvalues.csv')
+    # Read the data from the csv file
+    data = pd.read_csv("max_eigenvalues.csv")
+    
+    # Define the plot, set the limits and save the plot
     fig, ax = plt.subplots()
     sns.lineplot(data=data, ax=ax)
-    plt.axhline(0, color='black', linewidth=1)
+    plt.axhline(0, color="black", linewidth=1)
     ax.set_ylim(-0.5, 3)
-    plt.savefig('max_eigenvalues.png')
+    plt.savefig("max_eigenvalues.png")
     plt.show()
 
 
@@ -361,27 +432,36 @@ parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", defau
 
 if __name__ == "__main__":
 
+    # Set the device
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    
+    # Set the writer and load the dataset
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
 
     args = parser.parse_args()
-    
+
+    # Check if the csv file exists
     csv_path = os.path.exists(os.path.join(os.getcwd(), "Jacobian/max_eigenvalues.csv"))
     if csv_path:
         plot_eigenvalues()
-    
+
     else:
+        # Otherwise, train the model with the given hyperparameters
         epochs = args.epoch
         conv_layer = args.conv
         hidden_dim = args.hidden
         antisymmetry = True if args.asym == 1 else False
-        model = train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=antisymmetry)
-        model = train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=False)
+        model = train(
+            dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=antisymmetry
+        )
+        model = train(
+            dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=False
+        )
         # visualization_nodembs(dataset, model)
-        
-        # Store the list in a dataframe
+
+        # Store the lists in a dataframe and save it to a csv file
         df = pd.DataFrame()
-        df['True'] = max_eigenvalues_list_true
-        df['False'] = max_eigenvalues_list_false
+        df["True"] = max_eigenvalues_list_true
+        df["False"] = max_eigenvalues_list_false
         df.to_csv(csv_path, index=False)

@@ -1,5 +1,3 @@
-# https://www.youtube.com/watch?v=CwsPoa7z2c8
-# https://github.com/Altricch/GNN-s/blob/main/Train/GAT.py
 
 # GAT = Graph Attention Network --> let to learn automatically the importance of each node in the graph
 
@@ -52,87 +50,6 @@ from torch_geometric.nn import GATConv
 
 import argparse
 
-# region: GATConv old
-# class GATConv(nn.Module):
-#     def __init__(self, in_channels, out_channels, heads, 
-#                 negative_slope = 0.2, dropout=0.6, concat=True):
-        
-#         super(GATConv, self).__init__()
-
-#         self.dropout = dropout
-#         self.in_features = in_channels
-#         self.out_features = out_channels
-#         self.heads = heads
-#         self.negative_slope = negative_slope # LeakyReLU
-#         self.concat = concat  # concat = True for all layers except the output layer
-
-#         # Xavier Initialization of Weights
-#         # self.W = nn.Parameter(torch.zeros(size=(in_channels, self.heads * out_channels)))
-#         self.W = nn.Parameter(torch.Tensor(in_channels, heads * out_channels))
-#         self.a = nn.Parameter(torch.Tensor(1, heads, 2 * out_channels))
-#         # nn.init.xavier_uniform_(self.W.data, gain=1.414)
-
-#         # Attention Weights
-#         # self.a = nn.Parameter(torch.zeros(size=(1, heads, 2 * out_channels)))
-#         # nn.init.xavier_uniform_(self.a.data, gain=1.414)
-#         self.reset_parameters()
-        
-#         # LeakyReLU
-#         self.leakyrelu = nn.LeakyReLU(self.negative_slope)
-    
-#     def reset_parameters(self):
-#         init.xavier_uniform_(self.W)
-#         init.xavier_uniform_(self.a)
-
-#     def forward(self, x, edge_index):
-
-#         # Linear Transformation
-#         # x = torch.mm(x, self.W)
-#         # # breakpoint()
-#         # # 
-#         # wh1 = torch.matmul(x, self.a[:self.out_features, :])
-#         # wh2 = torch.matmul(x, self.a[self.out_features:, :])
-        
-#         # # 
-#         # e = self.leakyrelu(wh1 + wh2.T)
-        
-#         # # 
-#         # attention = F.softmax(e, dim=1)
-        
-#         # # 
-#         # # attention = F.softmax(e, dim=1)
-        
-#         # # 
-#         # h_prime = torch.matmul(attention, x)
-        
-#         # # 
-#         # if self.concat:
-#         #     return F.elu(h_prime)
-#         # else:
-#         #     return h_prime
-#         # breakpoint()
-#         x = torch.mm(x, self.W).view(-1, self.heads, self.out_features)
-#         edge_index_i, edge_index_j = edge_index
-        
-#         # Calculate attention coefficients
-#         x_i = x[edge_index_i]
-#         x_j = x[edge_index_j]
-        
-#         a_input = torch.cat([x_i, x_j], dim=-1).unsqueeze(0) * self.a
-        
-#         e = self.leakyrelu(a_input).sum(dim=-1)
-        
-#         alpha = F.softmax(e, dim=1)
-        
-#         out = (x_j * alpha.unsqueeze(-1)).sum(dim=1)
-        
-#         if self.concat:
-#             return out.view(-1, self.heads * self.out_features)
-#         else:
-#             return out.mean(dim=1)
-# endregion 
-
-
 class GAT(nn.Module):
     def __init__(
         self,
@@ -145,6 +62,7 @@ class GAT(nn.Module):
     ):
         super(GAT, self).__init__()
 
+        # Variables definition
         self.n_features = in_channels
         self.n_classes = out_channels
         self.n_hidden = hidden_dim
@@ -152,22 +70,33 @@ class GAT(nn.Module):
         self.dropout = dropout
         self.concat = concat
 
+        # Linear transformation from input to hidden
         self.emb = nn.Linear(in_channels, hidden_dim)
         
+        # GAT layer from hidden to hidden 
         self.conv1 = GATConv(hidden_dim, hidden_dim, heads=self.n_heads, dropout=dropout, concat=self.concat)
+        
+        # GATConv from hidden to output
         self.conv2 = GATConv(hidden_dim * heads, out_channels, heads=self.n_heads, dropout=dropout, concat=False)
 
     def forward(self, data):
+        
+        # Get the node features and edge index
         x, edge_index = data.x, data.edge_index
 
+        # Apply the linear transformation
         x = self.emb(x)
 
+        # Apply the dropout
         x = F.dropout(x, p=self.dropout, training=self.training)
         
+        # Apply the GAT layer 1 and the activation function
         x = F.elu(self.conv1(x, edge_index))
         
+        # Apply the dropout
         x = F.dropout(x, p=self.dropout, training=self.training)
-        
+
+        # Apply the GAT layer 2
         x = self.conv2(x, edge_index)
         
         return F.log_softmax(x, dim=1)
@@ -175,13 +104,18 @@ class GAT(nn.Module):
 
 def train(dataset, hidden_dim, writer, epochs, heads):
     
+    # Data loader
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
     # input_dim, output_dim, hidden_dim, num_heads
     model = GAT(dataset.num_node_features, dataset.num_classes, hidden_dim, heads)
+    
+    # Define the optimizer and the loss function
     opt = optim.Adam(model.parameters(), lr=0.003)
     loss_fn = nn.NLLLoss()
+    
+    # Accuracy list
     test_accuracies = []
 
     print(
@@ -195,24 +129,36 @@ def train(dataset, hidden_dim, writer, epochs, heads):
         model.train()
 
         for batch in loader:
+            # Reset the gradients
             opt.zero_grad()
+            
+            # forward pass
             pred = model(batch)
             label = batch.y
 
+            # Node classification: only compute loss for nodes in the training set
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
+            # Calculate the loss
             loss = loss_fn(pred, label)
 
+            # Backward pass
             loss.backward()
 
+            # Update the model weights
             opt.step()
 
+            # Accumulate the loss
             total_loss += loss.item() * batch.num_graphs
+        
+        # Average loss
         total_loss /= len(loader.dataset)
-        # tensorboard
+        
+        # Write the loss to tensorboard
         writer.add_scalar("Loss", total_loss, epoch)
 
+        # Evaluate the model every 10 epochs on the test set
         if epoch % 10 == 0:
             test_acc = test(test_loader, model)
             test_accuracies.append(test_acc)
@@ -221,8 +167,10 @@ def train(dataset, hidden_dim, writer, epochs, heads):
                     epoch, total_loss, test_acc
                 )
             )
+            # Best accuracy so far
             model.best_accuracy = max(test_accuracies)
             print("best accuracy is", max(test_accuracies))
+            # Write the accuracy to tensorboard
             writer.add_scalar("test accuracy", test_acc, epoch)
 
     return model
@@ -234,21 +182,27 @@ def test(loader, model, is_validation=False):
     correct = 0
     for data in loader:
         with torch.no_grad():
+            # Forward pass
             pred = model(data)
+            # Get the class with the highest probability
             pred = pred.argmax(dim=1)
+            # Get the label from the ground truth
             label = data.y
 
+        # # Get the mask for the validation or test set
         mask = data.val_mask if is_validation else data.test_mask
 
         # Node classification: only evaluate in test set
         pred = pred[mask]
         label = data.y[mask]
 
+        # Calculate the number of correctly classified nodes
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
+            # Total number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
@@ -261,7 +215,7 @@ parser.add_argument("--heads", type=int, help="Use number of heads", default=30)
 
 
 if __name__ == "__main__":
-
+    # Parse the arguments
     args = parser.parse_args()
     # Node classification
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))

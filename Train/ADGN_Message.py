@@ -1,4 +1,3 @@
-# https://www.youtube.com/watch?v=-UjytpbqX4A&t=2221s
 
 # !pip install torch-scatter
 # !pip install torch-cluster
@@ -55,6 +54,8 @@ class ADGNConv(pyg_nn.MessagePassing):
         super(ADGNConv, self).__init__(
             aggr="add"
         )  # "Add" aggregation (can alternatively use mean or max)
+
+        # Variables definition
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.gamma = gamma
@@ -83,9 +84,6 @@ class ADGNConv(pyg_nn.MessagePassing):
         init.uniform_(self.bias, -bound, bound)
         self.linear.reset_parameters()
 
-        # # Conv block
-        # self.conv = pyg_nn.GCNConv(in_channels, in_channels, bias=False)
-
     def forward(self, x, edge_index):
         # Antisymmetric formulation (paper formula 5)
         W = (
@@ -98,15 +96,20 @@ class ADGNConv(pyg_nn.MessagePassing):
         # Do forward pass for backpropp to learn weights of Linear Layer
         aggr_x = self.linear(x)
 
-        # breakpoint()
+        # Add self loops to edge index and split into row and col
         edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
         row, col = edge_index
-        # breakpoint()
+
+        # Compute the degree of each node
         deg = pyg_utils.degree(row, aggr_x.size()[0])
+
+        # Inverse square root of degree
         deg_inv_sqrt = deg.pow(-0.5)
-        # Formula 7 of paper
+
+        # Formula 7 of paper, normalization
         norm = deg_inv_sqrt[row] * deg_inv_sqrt[col]
 
+        # Propagate messages via aggregation function
         aggr_x = self.propagate(edge_index, x=aggr_x, norm=norm)
 
         # Store previous x
@@ -122,8 +125,6 @@ class ADGNConv(pyg_nn.MessagePassing):
     def message(self, x_j, norm):
         # Compute messages
         # x_j has shape [E, outchannels]
-
-        # Here we add outselves back in
         return norm.view(-1, 1) * x_j
 
 
@@ -140,6 +141,7 @@ class ADGN(nn.Module):
     ):
         super(ADGN, self).__init__()
 
+        # Variables definition
         self.in_channels = in_channels
         self.hidden_dim = hidden_dim
         self.out_channels = out_channels
@@ -147,10 +149,12 @@ class ADGN(nn.Module):
         self.gamma = gamma
         self.antisymmetry = antisymmetry
 
+        # Linear layer for embedding from input to hidden dimension
         self.emb = None
         if self.hidden_dim is not None:
             self.emb = nn.Linear(self.in_channels, hidden_dim, bias=False)
 
+        # Module list for convolutions
         self.conv = nn.ModuleList()
 
         # Apply hidden dimensions in conv block
@@ -165,39 +169,59 @@ class ADGN(nn.Module):
                 )
             )
 
+        # Linear layer for final output from hidden to output dimension
         self.linear = nn.Linear(self.hidden_dim, self.out_channels)
 
     def forward(self, x):
+
+        # Get the node features and edge index
         x, edge_idx = (
             x.x,
             x.edge_index,
         )
 
+        # Apply linear layer for embedding
         x = self.emb(x)
 
+        # Apply convolutions
         for conv in self.conv:
             x = conv(x, edge_idx)
             emb = x
 
+        # Apply final linear layer
         x = self.linear(x)
 
         return emb, x
 
 
 def visualization_nodembs(dataset, model):
+    # Color list for visualization
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
+
+    # Data loader definition
     loader = DataLoader(dataset, batch_size=1, shuffle=False)
+
+    # Embeddings and colors list
     embs = []
     colors = []
+
     for batch in loader:
+        # Get embeddings and predictions
         emb, pred = model(batch)
+
+        # Sppend embeddings
         embs.append(emb)
 
+        # Collect the colors based on the ground truth
         colors += [color_list[y] for y in batch.y]
+
+    # Concatenate embeddings
     embs = torch.cat(embs, dim=0)
 
+    # Get 2D representation of embeddings
     xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
 
+    # Plot the 2D representation
     plt.scatter(xs, ys, color=colors)
     plt.title(
         f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%, symmetry {model.antisymmetry}"
@@ -206,6 +230,8 @@ def visualization_nodembs(dataset, model):
 
 
 def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
+
+    # Data loader definition
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
 
     # Build model
@@ -218,8 +244,11 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         antisymmetry=antisymmetry,
     )
 
+    # Define optimizer and loss function
     opt = optim.Adam(model.parameters(), lr=0.01)
     loss_fn = nn.CrossEntropyLoss()
+
+    # Accuracies list
     test_accuracies = []
 
     print(
@@ -233,22 +262,39 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         model.train()
 
         for batch in loader:
+
+            # Reset gradients
             opt.zero_grad()
+
+            # Forward pass
             emb, pred = model(batch)
+
+            # Extract the labels
             label = batch.y
 
+            # Filter training mask and labels only for node classification
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
+            # Compute loss
             loss = loss_fn(pred, label)
+
+            # Backward pass
             loss.backward()
+
+            # Update the model weights
             opt.step()
+
+            # Accumulate the loss
             total_loss += loss.item() * batch.num_graphs
+
+        # Average loss
         total_loss /= len(loader.dataset)
 
-        # tensorboard
+        # Write the loss to tensorboard
         writer.add_scalar("Loss", total_loss, epoch)
 
+        # Evaluate the model every 10 epochs on the test set
         if epoch % 10 == 0:
             test_acc = test(test_loader, model)
             test_accuracies.append(test_acc)
@@ -257,8 +303,10 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
                     epoch, total_loss, test_acc
                 )
             )
+            # Best accuracy so far
             model.best_accuracy = max(test_accuracies)
             print("best accuracy is", max(test_accuracies))
+            # Write the test accuracy to tensorboard
             writer.add_scalar("test accuracy", test_acc, epoch)
 
     return model
@@ -270,21 +318,29 @@ def test(loader, model, is_validation=False):
     correct = 0
     for data in loader:
         with torch.no_grad():
+            # Get the embeddings and predictions
             emb, pred = model(data)
+
+            # Get the class with the highest probability
             pred = pred.argmax(dim=1)
+
+            # Get the label from the ground truth
             label = data.y
 
+        # Get the mask for the validation or test set
         mask = data.val_mask if is_validation else data.test_mask
 
         # Node classification: only evaluate in test set
         pred = pred[mask]
         label = data.y[mask]
 
+        # Compute the number of correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
+            # Number of nodes in the validation or test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
@@ -300,12 +356,14 @@ parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", defau
 
 if __name__ == "__main__":
 
-    # args = parser.parse_args()
-
+    # Set the device
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    # Set the writer for tensorboard
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+    # Load the dataset
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
 
+    # Parse the arguments and run the training
     args = parser.parse_args()
 
     epochs = args.epoch
@@ -315,4 +373,6 @@ if __name__ == "__main__":
     model = train(
         dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=antisymmetry
     )
+
+    # Visualize the node embeddings
     visualization_nodembs(dataset, model)
