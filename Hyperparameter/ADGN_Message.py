@@ -355,6 +355,23 @@ def hyperparameter_search():
     
     requirements = {}
 
+    # Reimport Dictionary to resume execution
+    #file_path = os.path.join(os.path.pardir, "ADGN_Message.py_requirements.json")
+    file_path = 'ADGN_Message.py_requirements.json'
+    if os.path.exists(file_path):
+        print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
+        print(file_path)
+        # Open the file and load the data
+        with open(file_path, 'r') as file:
+            requirements = json.load(file)
+    else:
+        print("diuccaro")
+        print(current_filename)
+        current_filename + "_requirements.json"
+
+    #else:
+    #    raise Exception("file not found")
+
     # Possible hyperparameters
     # convs = [1, 2, 3, 5, 10, 12, 20, 30]
     # learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
@@ -374,7 +391,10 @@ def hyperparameter_search():
     num_cpus = psutil.cpu_count()
     
     start_time = time()
-    
+
+    #Prevent CPU 0%
+    computeStats(0, -1, -1, -1, current_process, -1, requirements)
+    counter_conf = 0 
     for conv in convs:
 
         # Reset best accuracy, learning rate and hidden layer
@@ -389,19 +409,21 @@ def hyperparameter_search():
                 conf_start_time = time()
                 
                 # Train model and get best accuracy
-                print(f"[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
+                print(f"\n[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
                 
                 model, best_accuracy = train(
                     dataset, conv, writer=None, epochs=100, lr=lr, hidden_layer=lay
                 )
                 
-                computeStats(conf_start_time, conv, lr, lay, current_process, num_cpus, requirements)
+                computeStats(conf_start_time, conv, lr, lay, current_process, num_cpus, requirements, True, file_path, counter_conf)
 
                 # Update best hyperparameters
                 if all_best_acc < best_accuracy:
                     all_best_lr = lr
                     all_best_hidden = lay
                     all_best_acc = best_accuracy
+
+                counter_conf +=1
 
         # Store the best hyperparameters
         configs[conv] = {
@@ -414,7 +436,7 @@ def hyperparameter_search():
     # with open(current_filename + "_config.json", "w") as json_file:
     #     json.dump(configs, json_file, indent=4)
     
-    with open(current_filename + "_requirements.json", "w") as json_file:
+    with open(file_path, "w") as json_file:
         json.dump(requirements, json_file, indent=4)
 
 
