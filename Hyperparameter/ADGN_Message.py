@@ -40,6 +40,13 @@ import matplotlib.pyplot as plt
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
+import psutil
+import sys
+from time import sleep, time
+
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from ComputationRequirements.compstats import computeStats
 
 torch.manual_seed(42)
 np.random.seed(42)
@@ -345,13 +352,29 @@ def hyperparameter_search():
     current_filename = os.path.abspath(__file__).split("/")[-1]
 
     configs = {}
+    
+    requirements = {}
 
     # Possible hyperparameters
-    convs = [1, 2, 3, 5, 10, 12, 20, 30]
-    learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
-    hidden_layers = [4, 8, 12, 24, 48, 64, 128]
+    # convs = [1, 2, 3, 5, 10, 12, 20, 30]
+    # learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
+    # hidden_layers = [4, 8, 12, 24, 48, 64, 128]
+    
+    convs = [1]
+    learning_rates = [0.1, 10e-5]
+    hidden_layers = [4, 8]
 
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
+    
+    
+    # Get the current process ID
+    pid = os.getpid()
+    # Get the psutil Process object using the PID
+    current_process = psutil.Process(pid)
+    num_cpus = psutil.cpu_count()
+    
+    start_time = time()
+    
     for conv in convs:
 
         # Reset best accuracy, learning rate and hidden layer
@@ -360,13 +383,19 @@ def hyperparameter_search():
         all_best_hidden = 0
 
         for lr in learning_rates:
+            
             for lay in hidden_layers:
-
+                
+                conf_start_time = time()
+                
                 # Train model and get best accuracy
                 print(f"[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
+                
                 model, best_accuracy = train(
                     dataset, conv, writer=None, epochs=100, lr=lr, hidden_layer=lay
                 )
+                
+                computeStats(conf_start_time, conv, lr, lay, current_process, num_cpus, requirements)
 
                 # Update best hyperparameters
                 if all_best_acc < best_accuracy:
@@ -382,8 +411,11 @@ def hyperparameter_search():
         }
 
     # Dump into a json file to be retrieved when testing
-    with open(current_filename + "_config.json", "w") as json_file:
-        json.dump(configs, json_file, indent=4)
+    # with open(current_filename + "_config.json", "w") as json_file:
+    #     json.dump(configs, json_file, indent=4)
+    
+    with open(current_filename + "_requirements.json", "w") as json_file:
+        json.dump(requirements, json_file, indent=4)
 
 
 ### Flags Areas ###
@@ -397,18 +429,6 @@ parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", defau
 if __name__ == "__main__":
 
     args = parser.parse_args()
-    ############# Monitoring ################
-    import threading
-    import resource_monitor
-
-    # Start monitoring in a separate thread
-    monitor_thread = threading.Thread(target=resource_monitor.monitor_resources, args=(10, 3600))  # Monitor for 1 hour
-    monitor_thread.start()
 
     # Your grid search code here
-    # perform_grid_search()
-    #########################################
     hyperparameter_search()
-
-    # Optionally, wait for the monitoring thread to finish
-    monitor_thread.join()
