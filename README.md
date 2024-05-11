@@ -52,7 +52,7 @@ The repository is structured as follows:
     |   |
     |   ├── visualization.py            <- Script that generates both GCN.png and ADGN.png.
     |
-    ├── PDFs                             <- PDF Folder.
+    ├── PDFs                             <- PDFs Folder.
     |   |
     |   ├── ADGN.pdf                    <- ADGN paper.
     |   |
