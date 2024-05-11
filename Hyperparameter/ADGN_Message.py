@@ -338,7 +338,6 @@ def test(loader, model, is_validation=False):
 
 # Grid search for hyperparameters
 def hyperparameter_search():
-
     all_best_acc = float("-inf")
     all_best_lr = 0
     all_best_hidden = 0
@@ -364,6 +363,7 @@ def hyperparameter_search():
             for lay in hidden_layers:
 
                 # Train model and get best accuracy
+                print(f"[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
                 model, best_accuracy = train(
                     dataset, conv, writer=None, epochs=100, lr=lr, hidden_layer=lay
                 )
@@ -396,6 +396,19 @@ parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", defau
 
 if __name__ == "__main__":
 
-    # args = parser.parse_args()
+    args = parser.parse_args()
+    ############# Monitoring ################
+    import threading
+    import resource_monitor
 
+    # Start monitoring in a separate thread
+    monitor_thread = threading.Thread(target=resource_monitor.monitor_resources, args=(10, 3600))  # Monitor for 1 hour
+    monitor_thread.start()
+
+    # Your grid search code here
+    # perform_grid_search()
+    #########################################
     hyperparameter_search()
+
+    # Optionally, wait for the monitoring thread to finish
+    monitor_thread.join()
