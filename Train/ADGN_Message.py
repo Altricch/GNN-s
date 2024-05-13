@@ -37,6 +37,14 @@ import matplotlib.pyplot as plt
 from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
+# For CPU/GPU UILITZATION
+import json
+import os
+import sys
+from time import time
+import psutil
+from compstats import computeStats
+
 torch.manual_seed(42)
 np.random.seed(42)
 
@@ -236,16 +244,53 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
     loss_fn = nn.CrossEntropyLoss()
 
     test_accuracies = []
+    
+    
+    # For CPU/GPU UILITZATION
+    current_filename = os.path.abspath(__file__).split("/")[-1]
+    
+    requirements = {}
 
+    # Reimport Dictionary to resume execution
+    #file_path = os.path.join(os.path.pardir, "ADGN_Message.py_requirements.json")
+    file_path = 'Train/comp_per_model/ADGN_Message.py_requirements.json'
+    if os.path.exists(file_path):
+        print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
+        print(file_path)
+        # Open the file and load the data
+        with open(file_path, 'r') as file:
+            requirements = json.load(file)
+    else:
+        print("diuccaro")
+        print(current_filename)
+        current_filename + "_requirements.json"
+    
+    
+    pid = os.getpid()
+    # Get the psutil Process object using the PID
+    current_process = psutil.Process(pid)
+    num_cpus = psutil.cpu_count()
+    
+    start_time = time()
+    computeStats(start_time,-1, current_process, -1, requirements)
+    
+    ###########################
+    
+    
+    
     print(
         "#" * 20
-        + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {model.antisymmetric} "
+        + f" Running ADGN, with {str(epochs)} epochs, {str(conv_layer)} convs and antisymmetric {antisymmetry} "
         + "#" * 20
     )
 
     for epoch in range(0, epochs):
         total_loss = 0
         model.train()
+        
+        
+        # For CPU/GPU UILITZATION
+        computeStats(start_time, epoch, current_process, num_cpus, requirements)
 
         for batch in loader:
 
@@ -289,6 +334,11 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
             # Write the test accuracy to tensorboard
             writer.add_scalar("test accuracy", test_acc, epoch)
 
+    
+    # For CPU/GPU UILITZATION
+    with open(file_path, "w") as json_file:
+        json.dump(requirements, json_file, indent=4)
+    
     return model
 
 
@@ -345,7 +395,7 @@ if __name__ == "__main__":
     hidden_dim = args.hidden
     antisymmetry = True if args.asym == 1 else False
     model = train(
-        dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=antisymmetry
+        dataset, 3, 32, writer, epochs, antisymmetry=True
     )
 
     # Visualize the node embeddings

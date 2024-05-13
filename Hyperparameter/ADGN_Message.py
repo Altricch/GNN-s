@@ -365,7 +365,6 @@ def hyperparameter_search():
         with open(file_path, 'r') as file:
             requirements = json.load(file)
     else:
-        print("diuccaro")
         print(current_filename)
         current_filename + "_requirements.json"
 
@@ -373,13 +372,13 @@ def hyperparameter_search():
     #    raise Exception("file not found")
 
     # Possible hyperparameters
-    # convs = [1, 2, 3, 5, 10, 12, 20, 30]
-    # learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
-    # hidden_layers = [4, 8, 12, 24, 48, 64, 128]
+    convs = [1, 2, 3, 5, 10, 12, 20, 30]
+    learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
+    hidden_layers = [4, 8, 12, 24, 48, 64, 128]
     
-    convs = [1]
-    learning_rates = [0.1, 10e-5]
-    hidden_layers = [4, 8]
+    # convs = [1]
+    # learning_rates = [0.1, 10e-5]
+    # hidden_layers = [4, 8]
 
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
     
@@ -407,7 +406,9 @@ def hyperparameter_search():
             for lay in hidden_layers:
                 
                 conf_start_time = time()
-                
+                if (counter_conf < 279):
+                    counter_conf +=1
+                    continue
                 # Train model and get best accuracy
                 print(f"\n[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
                 

@@ -1,0 +1,302 @@
+{
+    "0 Conv 1, LR 0.003, Hidden 10, Model ADGNT": {
+        "CPU": 85.45,
+        "Memory": 2.14,
+        "Time": 7.33
+    },
+    "1 Conv 1, LR 0.003, Hidden 10, Model ADGNF": {
+        "CPU": 85.53,
+        "Memory": 2.14,
+        "Time": 6.44
+    },
+    "2 Conv 1, LR 0.003, Hidden 10, Model GCN": {
+        "CPU": 82.39,
+        "Memory": 1.76,
+        "Time": 23.03
+    },
+    "3 Conv 1, LR 0.003, Hidden 10, Model GAT": {
+        "CPU": 82.8,
+        "Memory": 1.76,
+        "Time": 25.65
+    },
+    "4 Conv 1, LR 0.003, Hidden 10, Model GGNN": {
+        "CPU": 82.57,
+        "Memory": 1.77,
+        "Time": 20.4
+    },
+    "5 Conv 1, LR 0.003, Hidden 20, Model ADGNT": {
+        "CPU": 89.37,
+        "Memory": 1.77,
+        "Time": 9.77
+    },
+    "6 Conv 1, LR 0.003, Hidden 20, Model ADGNF": {
+        "CPU": 85.54,
+        "Memory": 1.77,
+        "Time": 10.24
+    },
+    "7 Conv 1, LR 0.003, Hidden 20, Model GCN": {
+        "CPU": 94.75,
+        "Memory": 1.78,
+        "Time": 60.28
+    },
+    "8 Conv 1, LR 0.003, Hidden 20, Model GAT": {
+        "CPU": 98.3,
+        "Memory": 1.83,
+        "Time": 75.88
+    },
+    "9 Conv 1, LR 0.003, Hidden 20, Model GGNN": {
+        "CPU": 98.12,
+        "Memory": 1.83,
+        "Time": 63.89
+    },
+    "10 Conv 1, LR 0.003, Hidden 30, Model ADGNT": {
+        "CPU": 93.4,
+        "Memory": 1.83,
+        "Time": 14.17
+    },
+    "11 Conv 1, LR 0.003, Hidden 30, Model ADGNF": {
+        "CPU": 94.3,
+        "Memory": 1.83,
+        "Time": 10.06
+    },
+    "12 Conv 1, LR 0.003, Hidden 30, Model GCN": {
+        "CPU": 97.05,
+        "Memory": 1.83,
+        "Time": 66.5
+    },
+    "13 Conv 1, LR 0.003, Hidden 30, Model GAT": {
+        "CPU": 98.11,
+        "Memory": 1.83,
+        "Time": 79.86
+    },
+    "14 Conv 1, LR 0.003, Hidden 30, Model GGNN": {
+        "CPU": 98.27,
+        "Memory": 1.83,
+        "Time": 65.39
+    },
+    "15 Conv 5, LR 0.003, Hidden 10, Model ADGNT": {
+        "CPU": 98.49,
+        "Memory": 1.83,
+        "Time": 78.7
+    },
+    "16 Conv 5, LR 0.003, Hidden 10, Model ADGNF": {
+        "CPU": 97.64,
+        "Memory": 1.83,
+        "Time": 73.21
+    },
+    "17 Conv 5, LR 0.003, Hidden 10, Model GCN": {
+        "CPU": 97.38,
+        "Memory": 1.83,
+        "Time": 84.54
+    },
+    "18 Conv 5, LR 0.003, Hidden 10, Model GAT": {
+        "CPU": 97.78,
+        "Memory": 1.84,
+        "Time": 91.71
+    },
+    "19 Conv 5, LR 0.003, Hidden 10, Model GGNN": {
+        "CPU": 95.38,
+        "Memory": 1.84,
+        "Time": 95.36
+    },
+    "20 Conv 5, LR 0.003, Hidden 20, Model ADGNT": {
+        "CPU": 98.6,
+        "Memory": 1.84,
+        "Time": 103.23
+    },
+    "21 Conv 5, LR 0.003, Hidden 20, Model ADGNF": {
+        "CPU": 98.65,
+        "Memory": 1.84,
+        "Time": 94.76
+    },
+    "22 Conv 5, LR 0.003, Hidden 20, Model GCN": {
+        "CPU": 98.12,
+        "Memory": 1.84,
+        "Time": 148.18
+    },
+    "23 Conv 5, LR 0.003, Hidden 20, Model GAT": {
+        "CPU": 98.03,
+        "Memory": 1.79,
+        "Time": 109.39
+    },
+    "24 Conv 5, LR 0.003, Hidden 20, Model GGNN": {
+        "CPU": 97.88,
+        "Memory": 1.79,
+        "Time": 370.86
+    },
+    "25 Conv 5, LR 0.003, Hidden 30, Model ADGNT": {
+        "CPU": 97.85,
+        "Memory": 1.79,
+        "Time": 198.45
+    },
+    "26 Conv 5, LR 0.003, Hidden 30, Model ADGNF": {
+        "CPU": 97.77,
+        "Memory": 1.79,
+        "Time": 211.51
+    },
+    "27 Conv 5, LR 0.003, Hidden 30, Model GCN": {
+        "CPU": 98.09,
+        "Memory": 1.79,
+        "Time": 276.9
+    },
+    "28 Conv 5, LR 0.003, Hidden 30, Model GAT": {
+        "CPU": 97.85,
+        "Memory": 1.79,
+        "Time": 116.51
+    },
+    "29 Conv 5, LR 0.003, Hidden 30, Model GGNN": {
+        "CPU": 98.02,
+        "Memory": 1.79,
+        "Time": 398.01
+    },
+    "30 Conv 10, LR 0.003, Hidden 10, Model ADGNT": {
+        "CPU": 97.74,
+        "Memory": 1.79,
+        "Time": 424.58
+    },
+    "31 Conv 10, LR 0.003, Hidden 10, Model ADGNF": {
+        "CPU": 98.02,
+        "Memory": 1.79,
+        "Time": 382.56
+    },
+    "32 Conv 10, LR 0.003, Hidden 10, Model GCN": {
+        "CPU": 98.27,
+        "Memory": 1.79,
+        "Time": 437.46
+    },
+    "33 Conv 10, LR 0.003, Hidden 10, Model GAT": {
+        "CPU": 97.56,
+        "Memory": 1.79,
+        "Time": 113.86
+    },
+    "34 Conv 10, LR 0.003, Hidden 10, Model GGNN": {
+        "CPU": 98.02,
+        "Memory": 1.79,
+        "Time": 683.54
+    },
+    "35 Conv 10, LR 0.003, Hidden 20, Model ADGNT": {
+        "CPU": 97.56,
+        "Memory": 1.79,
+        "Time": 440.23
+    },
+    "36 Conv 10, LR 0.003, Hidden 20, Model ADGNF": {
+        "CPU": 97.94,
+        "Memory": 1.79,
+        "Time": 430.93
+    },
+    "37 Conv 10, LR 0.003, Hidden 20, Model GCN": {
+        "CPU": 98.34,
+        "Memory": 1.79,
+        "Time": 459.59
+    },
+    "38 Conv 10, LR 0.003, Hidden 20, Model GAT": {
+        "CPU": 98.16,
+        "Memory": 1.79,
+        "Time": 118.25
+    },
+    "39 Conv 10, LR 0.003, Hidden 20, Model GGNN": {
+        "CPU": 98.04,
+        "Memory": 1.79,
+        "Time": 649.76
+    },
+    "40 Conv 10, LR 0.003, Hidden 30, Model ADGNT": {
+        "CPU": 98.2,
+        "Memory": 1.79,
+        "Time": 400.01
+    },
+    "41 Conv 10, LR 0.003, Hidden 30, Model ADGNF": {
+        "CPU": 98.26,
+        "Memory": 1.79,
+        "Time": 387.12
+    },
+    "42 Conv 10, LR 0.003, Hidden 30, Model GCN": {
+        "CPU": 98.32,
+        "Memory": 1.79,
+        "Time": 468.29
+    },
+    "43 Conv 10, LR 0.003, Hidden 30, Model GAT": {
+        "CPU": 98.01,
+        "Memory": 1.82,
+        "Time": 126.57
+    },
+    "44 Conv 10, LR 0.003, Hidden 30, Model GGNN": {
+        "CPU": 98.3,
+        "Memory": 1.82,
+        "Time": 683.97
+    },
+    "45 Conv 20, LR 0.003, Hidden 10, Model ADGNT": {
+        "CPU": 98.22,
+        "Memory": 1.82,
+        "Time": 768.42
+    },
+    "46 Conv 20, LR 0.003, Hidden 10, Model ADGNF": {
+        "CPU": 98.38,
+        "Memory": 1.82,
+        "Time": 742.98
+    },
+    "47 Conv 20, LR 0.003, Hidden 10, Model GCN": {
+        "CPU": 98.38,
+        "Memory": 1.82,
+        "Time": 787.6
+    },
+    "48 Conv 20, LR 0.003, Hidden 10, Model GAT": {
+        "CPU": 97.42,
+        "Memory": 1.82,
+        "Time": 120.62
+    },
+    "49 Conv 20, LR 0.003, Hidden 10, Model GGNN": {
+        "CPU": 98.41,
+        "Memory": 1.82,
+        "Time": 1184.94
+    },
+    "50 Conv 20, LR 0.003, Hidden 20, Model ADGNT": {
+        "CPU": 98.35,
+        "Memory": 1.82,
+        "Time": 796.43
+    },
+    "51 Conv 20, LR 0.003, Hidden 20, Model ADGNF": {
+        "CPU": 98.08,
+        "Memory": 1.82,
+        "Time": 797.24
+    },
+    "52 Conv 20, LR 0.003, Hidden 20, Model GCN": {
+        "CPU": 98.35,
+        "Memory": 1.83,
+        "Time": 833.38
+    },
+    "53 Conv 20, LR 0.003, Hidden 20, Model GAT": {
+        "CPU": 96.69,
+        "Memory": 1.83,
+        "Time": 137.7
+    },
+    "54 Conv 20, LR 0.003, Hidden 20, Model GGNN": {
+        "CPU": 97.33,
+        "Memory": 1.83,
+        "Time": 1189.63
+    },
+    "55 Conv 20, LR 0.003, Hidden 30, Model ADGNT": {
+        "CPU": 98.43,
+        "Memory": 1.83,
+        "Time": 739.93
+    },
+    "56 Conv 20, LR 0.003, Hidden 30, Model ADGNF": {
+        "CPU": 98.27,
+        "Memory": 1.83,
+        "Time": 751.49
+    },
+    "57 Conv 20, LR 0.003, Hidden 30, Model GCN": {
+        "CPU": 97.24,
+        "Memory": 1.83,
+        "Time": 823.28
+    },
+    "58 Conv 20, LR 0.003, Hidden 30, Model GAT": {
+        "CPU": 96.98,
+        "Memory": 1.84,
+        "Time": 158.84
+    },
+    "59 Conv 20, LR 0.003, Hidden 30, Model GGNN": {
+        "CPU": 98.36,
+        "Memory": 1.84,
+        "Time": 1138.51
+    }
+}

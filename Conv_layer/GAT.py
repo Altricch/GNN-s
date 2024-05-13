@@ -97,6 +97,7 @@ class GAT(nn.Module):
 
         # Apply the linear transformation
         x = self.emb(x)
+        emb = x
 
         x = F.dropout(x, p=self.dropout, training=self.training)
 
@@ -108,7 +109,7 @@ class GAT(nn.Module):
         # Apply the GAT layer 2
         x = self.conv2(x, edge_index)
 
-        return F.log_softmax(x, dim=1)
+        return emb, F.log_softmax(x, dim=1)
 
 
 # Train the model

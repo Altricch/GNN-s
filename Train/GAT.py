@@ -47,6 +47,14 @@ from torch_geometric.data import DataLoader
 # GATConv from torch_geometric
 from torch_geometric.nn import GATConv
 
+# For CPU/GPU UILITZATION
+import json
+import os
+import sys
+from time import time
+import psutil
+from compstats import computeStats
+
 import argparse
 
 
@@ -124,6 +132,36 @@ def train(dataset, hidden_dim, writer, epochs, heads):
     loss_fn = nn.NLLLoss()
 
     test_accuracies = []
+    
+    # For CPU/GPU UILITZATION
+    current_filename = os.path.abspath(__file__).split("/")[-1]
+    
+    requirements = {}
+
+    # Reimport Dictionary to resume execution
+    #file_path = os.path.join(os.path.pardir, "ADGN_Message.py_requirements.json")
+    file_path = 'Train/comp_per_model/GAT.py_requirements.json'
+    if os.path.exists(file_path):
+        print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
+        print(file_path)
+        # Open the file and load the data
+        with open(file_path, 'r') as file:
+            requirements = json.load(file)
+    else:
+        print("diuccaro")
+        print(current_filename)
+        current_filename + "_requirements.json"
+    
+    
+    pid = os.getpid()
+    # Get the psutil Process object using the PID
+    current_process = psutil.Process(pid)
+    num_cpus = psutil.cpu_count()
+    
+    start_time = time()
+    computeStats(start_time,-1, current_process, -1, requirements)
+    
+    
 
     print(
         "#" * 20
@@ -134,6 +172,9 @@ def train(dataset, hidden_dim, writer, epochs, heads):
     for epoch in range(0, epochs):
         total_loss = 0
         model.train()
+        
+        # For CPU/GPU UILITZATION
+        computeStats(start_time, epoch, current_process, num_cpus, requirements)
 
         for batch in loader:
 
@@ -175,6 +216,10 @@ def train(dataset, hidden_dim, writer, epochs, heads):
             # Write the accuracy to tensorboard
             writer.add_scalar("test accuracy", test_acc, epoch)
 
+    # For CPU/GPU UILITZATION
+    with open(file_path, "w") as json_file:
+        json.dump(requirements, json_file, indent=4)
+    
     return model
 
 
@@ -221,7 +266,7 @@ if __name__ == "__main__":
 
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
-    heads = args.heads
-    epochs = args.epoch
-    hidden_dim = args.hidden
+    heads = 3
+    epochs = 100
+    hidden_dim = 32
     model = train(dataset, hidden_dim, writer, epochs, heads)

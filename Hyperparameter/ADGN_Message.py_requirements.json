@@ -1,0 +1,1322 @@
+{
+    "0 Conv 1, LR 0.1, Hidden 4": {
+        "CPU": 77.94,
+        "Memory": 1.81,
+        "Time": 5.79
+    },
+    "1 Conv 1, LR 0.1, Hidden 8": {
+        "CPU": 79.23,
+        "Memory": 1.82,
+        "Time": 7.22
+    },
+    "2 Conv 1, LR 0.1, Hidden 12": {
+        "CPU": 61.92,
+        "Memory": 1.05,
+        "Time": 22.99
+    },
+    "3 Conv 1, LR 0.1, Hidden 24": {
+        "CPU": 72.15,
+        "Memory": 1.05,
+        "Time": 17.6
+    },
+    "4 Conv 1, LR 0.1, Hidden 48": {
+        "CPU": 80.61,
+        "Memory": 1.05,
+        "Time": 14.64
+    },
+    "5 Conv 1, LR 0.1, Hidden 64": {
+        "CPU": 83.49,
+        "Memory": 1.05,
+        "Time": 13.61
+    },
+    "6 Conv 1, LR 0.1, Hidden 128": {
+        "CPU": 79.18,
+        "Memory": 1.05,
+        "Time": 21.29
+    },
+    "7 Conv 1, LR 0.01, Hidden 4": {
+        "CPU": 81.65,
+        "Memory": 1.05,
+        "Time": 6.85
+    },
+    "8 Conv 1, LR 0.01, Hidden 8": {
+        "CPU": 73.12,
+        "Memory": 1.05,
+        "Time": 11.08
+    },
+    "9 Conv 1, LR 0.01, Hidden 12": {
+        "CPU": 72.91,
+        "Memory": 1.05,
+        "Time": 14.96
+    },
+    "10 Conv 1, LR 0.01, Hidden 24": {
+        "CPU": 81.04,
+        "Memory": 1.05,
+        "Time": 12.79
+    },
+    "11 Conv 1, LR 0.01, Hidden 48": {
+        "CPU": 81.01,
+        "Memory": 1.82,
+        "Time": 12.67
+    },
+    "12 Conv 1, LR 0.01, Hidden 64": {
+        "CPU": 82.5,
+        "Memory": 1.82,
+        "Time": 14.28
+    },
+    "13 Conv 1, LR 0.01, Hidden 128": {
+        "CPU": 81.78,
+        "Memory": 1.82,
+        "Time": 16.02
+    },
+    "14 Conv 1, LR 0.01, Hidden 4": {
+        "CPU": 85.4,
+        "Memory": 1.82,
+        "Time": 3.93
+    },
+    "15 Conv 1, LR 0.01, Hidden 8": {
+        "CPU": 85.04,
+        "Memory": 1.82,
+        "Time": 5.48
+    },
+    "16 Conv 1, LR 0.01, Hidden 12": {
+        "CPU": 85.9,
+        "Memory": 1.82,
+        "Time": 6.29
+    },
+    "17 Conv 1, LR 0.01, Hidden 24": {
+        "CPU": 85.71,
+        "Memory": 1.82,
+        "Time": 8.24
+    },
+    "18 Conv 1, LR 0.01, Hidden 48": {
+        "CPU": 86.1,
+        "Memory": 1.82,
+        "Time": 9.61
+    },
+    "19 Conv 1, LR 0.01, Hidden 64": {
+        "CPU": 86.33,
+        "Memory": 1.82,
+        "Time": 10.99
+    },
+    "20 Conv 1, LR 0.01, Hidden 128": {
+        "CPU": 86.28,
+        "Memory": 1.82,
+        "Time": 13.15
+    },
+    "21 Conv 1, LR 0.001, Hidden 4": {
+        "CPU": 85.54,
+        "Memory": 1.82,
+        "Time": 3.82
+    },
+    "22 Conv 1, LR 0.001, Hidden 8": {
+        "CPU": 86.37,
+        "Memory": 1.82,
+        "Time": 5.12
+    },
+    "23 Conv 1, LR 0.001, Hidden 12": {
+        "CPU": 86.27,
+        "Memory": 1.82,
+        "Time": 5.8
+    },
+    "24 Conv 1, LR 0.001, Hidden 24": {
+        "CPU": 86.19,
+        "Memory": 1.82,
+        "Time": 8.06
+    },
+    "25 Conv 1, LR 0.001, Hidden 48": {
+        "CPU": 85.46,
+        "Memory": 1.83,
+        "Time": 10.16
+    },
+    "26 Conv 1, LR 0.001, Hidden 64": {
+        "CPU": 79.18,
+        "Memory": 1.83,
+        "Time": 16.56
+    },
+    "27 Conv 1, LR 0.001, Hidden 128": {
+        "CPU": 82.27,
+        "Memory": 1.83,
+        "Time": 18.07
+    },
+    "28 Conv 1, LR 0.0001, Hidden 4": {
+        "CPU": 78.69,
+        "Memory": 1.83,
+        "Time": 6.18
+    },
+    "29 Conv 1, LR 0.0001, Hidden 8": {
+        "CPU": 80.71,
+        "Memory": 1.83,
+        "Time": 6.97
+    },
+    "30 Conv 1, LR 0.0001, Hidden 12": {
+        "CPU": 82.4,
+        "Memory": 1.83,
+        "Time": 7.69
+    },
+    "31 Conv 1, LR 0.0001, Hidden 24": {
+        "CPU": 83.31,
+        "Memory": 1.83,
+        "Time": 10.31
+    },
+    "32 Conv 1, LR 0.0001, Hidden 48": {
+        "CPU": 86.29,
+        "Memory": 1.83,
+        "Time": 9.42
+    },
+    "33 Conv 1, LR 0.0001, Hidden 64": {
+        "CPU": 83.55,
+        "Memory": 1.83,
+        "Time": 11.8
+    },
+    "34 Conv 1, LR 0.0001, Hidden 128": {
+        "CPU": 85.13,
+        "Memory": 1.83,
+        "Time": 13.97
+    },
+    "35 Conv 2, LR 0.1, Hidden 4": {
+        "CPU": 83.77,
+        "Memory": 1.83,
+        "Time": 8.23
+    },
+    "36 Conv 2, LR 0.1, Hidden 8": {
+        "CPU": 83.13,
+        "Memory": 1.83,
+        "Time": 11.65
+    },
+    "37 Conv 2, LR 0.1, Hidden 12": {
+        "CPU": 79.48,
+        "Memory": 1.84,
+        "Time": 16.34
+    },
+    "38 Conv 2, LR 0.1, Hidden 24": {
+        "CPU": 80.33,
+        "Memory": 1.84,
+        "Time": 25.15
+    },
+    "39 Conv 2, LR 0.1, Hidden 48": {
+        "CPU": 85.06,
+        "Memory": 1.84,
+        "Time": 28.68
+    },
+    "40 Conv 2, LR 0.1, Hidden 64": {
+        "CPU": 84.45,
+        "Memory": 1.84,
+        "Time": 33.47
+    },
+    "41 Conv 2, LR 0.1, Hidden 128": {
+        "CPU": 86.3,
+        "Memory": 1.84,
+        "Time": 50.98
+    },
+    "42 Conv 2, LR 0.01, Hidden 4": {
+        "CPU": 86.79,
+        "Memory": 1.84,
+        "Time": 17.8
+    },
+    "43 Conv 2, LR 0.01, Hidden 8": {
+        "CPU": 86.23,
+        "Memory": 1.84,
+        "Time": 20.04
+    },
+    "44 Conv 2, LR 0.01, Hidden 12": {
+        "CPU": 85.32,
+        "Memory": 1.47,
+        "Time": 23.26
+    },
+    "45 Conv 2, LR 0.01, Hidden 24": {
+        "CPU": 86.39,
+        "Memory": 1.47,
+        "Time": 30.72
+    },
+    "46 Conv 2, LR 0.01, Hidden 48": {
+        "CPU": 85.91,
+        "Memory": 1.47,
+        "Time": 38.23
+    },
+    "47 Conv 2, LR 0.01, Hidden 64": {
+        "CPU": 81.26,
+        "Memory": 1.46,
+        "Time": 47.31
+    },
+    "48 Conv 2, LR 0.01, Hidden 128": {
+        "CPU": 84.39,
+        "Memory": 1.46,
+        "Time": 56.68
+    },
+    "49 Conv 2, LR 0.01, Hidden 4": {
+        "CPU": 83.79,
+        "Memory": 1.46,
+        "Time": 17.77
+    },
+    "50 Conv 2, LR 0.01, Hidden 8": {
+        "CPU": 83.3,
+        "Memory": 1.46,
+        "Time": 22.1
+    },
+    "51 Conv 2, LR 0.01, Hidden 12": {
+        "CPU": 82.36,
+        "Memory": 1.46,
+        "Time": 24.61
+    },
+    "52 Conv 2, LR 0.01, Hidden 24": {
+        "CPU": 84.39,
+        "Memory": 1.46,
+        "Time": 31.41
+    },
+    "53 Conv 2, LR 0.01, Hidden 48": {
+        "CPU": 82.87,
+        "Memory": 1.45,
+        "Time": 41.3
+    },
+    "54 Conv 2, LR 0.01, Hidden 64": {
+        "CPU": 83.98,
+        "Memory": 1.45,
+        "Time": 43.3
+    },
+    "55 Conv 2, LR 0.01, Hidden 128": {
+        "CPU": 86.04,
+        "Memory": 1.45,
+        "Time": 52.73
+    },
+    "56 Conv 2, LR 0.001, Hidden 4": {
+        "CPU": 86.75,
+        "Memory": 1.45,
+        "Time": 18.37
+    },
+    "57 Conv 2, LR 0.001, Hidden 8": {
+        "CPU": 84.68,
+        "Memory": 1.45,
+        "Time": 21.47
+    },
+    "58 Conv 2, LR 0.001, Hidden 12": {
+        "CPU": 81.79,
+        "Memory": 1.51,
+        "Time": 24.13
+    },
+    "59 Conv 2, LR 0.001, Hidden 24": {
+        "CPU": 83.86,
+        "Memory": 1.51,
+        "Time": 33.83
+    },
+    "60 Conv 2, LR 0.001, Hidden 48": {
+        "CPU": 83.1,
+        "Memory": 1.51,
+        "Time": 38.95
+    },
+    "61 Conv 2, LR 0.001, Hidden 64": {
+        "CPU": 83.69,
+        "Memory": 1.51,
+        "Time": 44.11
+    },
+    "62 Conv 2, LR 0.001, Hidden 128": {
+        "CPU": 85.76,
+        "Memory": 1.45,
+        "Time": 53.76
+    },
+    "63 Conv 2, LR 0.0001, Hidden 4": {
+        "CPU": 84.95,
+        "Memory": 1.45,
+        "Time": 17.48
+    },
+    "64 Conv 2, LR 0.0001, Hidden 8": {
+        "CPU": 83.29,
+        "Memory": 1.45,
+        "Time": 22.11
+    },
+    "65 Conv 2, LR 0.0001, Hidden 12": {
+        "CPU": 83.25,
+        "Memory": 1.45,
+        "Time": 24.64
+    },
+    "66 Conv 2, LR 0.0001, Hidden 24": {
+        "CPU": 81.64,
+        "Memory": 1.45,
+        "Time": 32.69
+    },
+    "67 Conv 2, LR 0.0001, Hidden 48": {
+        "CPU": 85.46,
+        "Memory": 1.45,
+        "Time": 35.86
+    },
+    "68 Conv 2, LR 0.0001, Hidden 64": {
+        "CPU": 86.59,
+        "Memory": 1.45,
+        "Time": 49.28
+    },
+    "69 Conv 2, LR 0.0001, Hidden 128": {
+        "CPU": 85.03,
+        "Memory": 1.45,
+        "Time": 60.73
+    },
+    "70 Conv 3, LR 0.1, Hidden 4": {
+        "CPU": 86.81,
+        "Memory": 1.45,
+        "Time": 28.64
+    },
+    "71 Conv 3, LR 0.1, Hidden 8": {
+        "CPU": 85.94,
+        "Memory": 1.45,
+        "Time": 32.69
+    },
+    "72 Conv 3, LR 0.1, Hidden 12": {
+        "CPU": 81.47,
+        "Memory": 1.45,
+        "Time": 38.86
+    },
+    "73 Conv 3, LR 0.1, Hidden 24": {
+        "CPU": 85.84,
+        "Memory": 1.45,
+        "Time": 47.51
+    },
+    "74 Conv 3, LR 0.1, Hidden 48": {
+        "CPU": 82.42,
+        "Memory": 1.46,
+        "Time": 66.94
+    },
+    "75 Conv 3, LR 0.1, Hidden 64": {
+        "CPU": 73.73,
+        "Memory": 1.46,
+        "Time": 97.88
+    },
+    "76 Conv 3, LR 0.1, Hidden 128": {
+        "CPU": 78.26,
+        "Memory": 1.46,
+        "Time": 121.39
+    },
+    "77 Conv 3, LR 0.01, Hidden 4": {
+        "CPU": 95.36,
+        "Memory": 1.46,
+        "Time": 73.96
+    },
+    "78 Conv 3, LR 0.01, Hidden 8": {
+        "CPU": 98.68,
+        "Memory": 1.45,
+        "Time": 88.33
+    },
+    "79 Conv 3, LR 0.01, Hidden 12": {
+        "CPU": 96.7,
+        "Memory": 1.45,
+        "Time": 62.56
+    },
+    "80 Conv 3, LR 0.01, Hidden 24": {
+        "CPU": 97.58,
+        "Memory": 1.45,
+        "Time": 72.32
+    },
+    "81 Conv 3, LR 0.01, Hidden 48": {
+        "CPU": 96.18,
+        "Memory": 1.45,
+        "Time": 103.96
+    },
+    "82 Conv 3, LR 0.01, Hidden 64": {
+        "CPU": 95.16,
+        "Memory": 1.46,
+        "Time": 108.12
+    },
+    "83 Conv 3, LR 0.01, Hidden 128": {
+        "CPU": 95.28,
+        "Memory": 1.46,
+        "Time": 125.29
+    },
+    "84 Conv 3, LR 0.01, Hidden 4": {
+        "CPU": 95.16,
+        "Memory": 1.46,
+        "Time": 163.4
+    },
+    "85 Conv 3, LR 0.01, Hidden 8": {
+        "CPU": 97.16,
+        "Memory": 1.46,
+        "Time": 91.57
+    },
+    "86 Conv 3, LR 0.01, Hidden 12": {
+        "CPU": 98.13,
+        "Memory": 1.46,
+        "Time": 90.6
+    },
+    "87 Conv 3, LR 0.01, Hidden 24": {
+        "CPU": 96.82,
+        "Memory": 1.46,
+        "Time": 98.33
+    },
+    "88 Conv 3, LR 0.01, Hidden 48": {
+        "CPU": 95.27,
+        "Memory": 1.46,
+        "Time": 110.9
+    },
+    "89 Conv 3, LR 0.01, Hidden 64": {
+        "CPU": 95.85,
+        "Memory": 1.46,
+        "Time": 107.27
+    },
+    "90 Conv 3, LR 0.01, Hidden 128": {
+        "CPU": 98.28,
+        "Memory": 1.46,
+        "Time": 123.51
+    },
+    "91 Conv 3, LR 0.001, Hidden 4": {
+        "CPU": 98.21,
+        "Memory": 1.46,
+        "Time": 84.72
+    },
+    "92 Conv 3, LR 0.001, Hidden 8": {
+        "CPU": 97.28,
+        "Memory": 1.46,
+        "Time": 87.85
+    },
+    "93 Conv 3, LR 0.001, Hidden 12": {
+        "CPU": 97.29,
+        "Memory": 1.46,
+        "Time": 88.41
+    },
+    "94 Conv 3, LR 0.001, Hidden 24": {
+        "CPU": 98.04,
+        "Memory": 1.46,
+        "Time": 95.42
+    },
+    "95 Conv 3, LR 0.001, Hidden 48": {
+        "CPU": 98.17,
+        "Memory": 1.46,
+        "Time": 103.21
+    },
+    "96 Conv 3, LR 0.001, Hidden 64": {
+        "CPU": 98.28,
+        "Memory": 1.46,
+        "Time": 105.4
+    },
+    "97 Conv 3, LR 0.001, Hidden 128": {
+        "CPU": 98.19,
+        "Memory": 1.46,
+        "Time": 123.06
+    },
+    "98 Conv 3, LR 0.0001, Hidden 4": {
+        "CPU": 97.26,
+        "Memory": 1.46,
+        "Time": 84.22
+    },
+    "99 Conv 3, LR 0.0001, Hidden 8": {
+        "CPU": 94.8,
+        "Memory": 1.46,
+        "Time": 80.97
+    },
+    "100 Conv 3, LR 0.0001, Hidden 12": {
+        "CPU": 95.74,
+        "Memory": 1.46,
+        "Time": 79.35
+    },
+    "101 Conv 3, LR 0.0001, Hidden 24": {
+        "CPU": 98.39,
+        "Memory": 1.46,
+        "Time": 91.7
+    },
+    "102 Conv 3, LR 0.0001, Hidden 48": {
+        "CPU": 98.24,
+        "Memory": 1.46,
+        "Time": 102.01
+    },
+    "103 Conv 3, LR 0.0001, Hidden 64": {
+        "CPU": 97.51,
+        "Memory": 1.46,
+        "Time": 102.83
+    },
+    "104 Conv 3, LR 0.0001, Hidden 128": {
+        "CPU": 97.88,
+        "Memory": 1.46,
+        "Time": 122.05
+    },
+    "105 Conv 5, LR 0.1, Hidden 4": {
+        "CPU": 98.22,
+        "Memory": 1.46,
+        "Time": 157.9
+    },
+    "106 Conv 5, LR 0.1, Hidden 8": {
+        "CPU": 98.3,
+        "Memory": 1.46,
+        "Time": 161.05
+    },
+    "107 Conv 5, LR 0.1, Hidden 12": {
+        "CPU": 97.11,
+        "Memory": 1.46,
+        "Time": 156.99
+    },
+    "108 Conv 5, LR 0.1, Hidden 24": {
+        "CPU": 98.52,
+        "Memory": 1.46,
+        "Time": 172.79
+    },
+    "109 Conv 5, LR 0.1, Hidden 48": {
+        "CPU": 97.08,
+        "Memory": 1.46,
+        "Time": 184.9
+    },
+    "110 Conv 5, LR 0.1, Hidden 64": {
+        "CPU": 97.92,
+        "Memory": 1.52,
+        "Time": 194.12
+    },
+    "111 Conv 5, LR 0.1, Hidden 128": {
+        "CPU": 98.35,
+        "Memory": 1.46,
+        "Time": 227.57
+    },
+    "112 Conv 5, LR 0.01, Hidden 4": {
+        "CPU": 96.05,
+        "Memory": 1.46,
+        "Time": 174.35
+    },
+    "113 Conv 5, LR 0.01, Hidden 8": {
+        "CPU": 97.53,
+        "Memory": 1.46,
+        "Time": 176.9
+    },
+    "114 Conv 5, LR 0.01, Hidden 12": {
+        "CPU": 97.81,
+        "Memory": 1.46,
+        "Time": 183.88
+    },
+    "115 Conv 5, LR 0.01, Hidden 24": {
+        "CPU": 95.76,
+        "Memory": 1.46,
+        "Time": 190.16
+    },
+    "116 Conv 5, LR 0.01, Hidden 48": {
+        "CPU": 98.22,
+        "Memory": 1.46,
+        "Time": 207.09
+    },
+    "117 Conv 5, LR 0.01, Hidden 64": {
+        "CPU": 95.71,
+        "Memory": 1.46,
+        "Time": 212.52
+    },
+    "118 Conv 5, LR 0.01, Hidden 128": {
+        "CPU": 96.72,
+        "Memory": 1.46,
+        "Time": 239.05
+    },
+    "119 Conv 5, LR 0.01, Hidden 4": {
+        "CPU": 97.68,
+        "Memory": 1.46,
+        "Time": 178.92
+    },
+    "120 Conv 5, LR 0.01, Hidden 8": {
+        "CPU": 95.36,
+        "Memory": 1.46,
+        "Time": 177.44
+    },
+    "121 Conv 5, LR 0.01, Hidden 12": {
+        "CPU": 98.47,
+        "Memory": 1.46,
+        "Time": 184.35
+    },
+    "122 Conv 5, LR 0.01, Hidden 24": {
+        "CPU": 97.01,
+        "Memory": 1.46,
+        "Time": 190.3
+    },
+    "123 Conv 5, LR 0.01, Hidden 48": {
+        "CPU": 95.34,
+        "Memory": 1.46,
+        "Time": 205.34
+    },
+    "124 Conv 5, LR 0.01, Hidden 64": {
+        "CPU": 97.29,
+        "Memory": 1.46,
+        "Time": 213.74
+    },
+    "125 Conv 5, LR 0.01, Hidden 128": {
+        "CPU": 97.65,
+        "Memory": 1.46,
+        "Time": 238.49
+    },
+    "126 Conv 5, LR 0.001, Hidden 4": {
+        "CPU": 98.25,
+        "Memory": 1.46,
+        "Time": 179.04
+    },
+    "127 Conv 5, LR 0.001, Hidden 8": {
+        "CPU": 95.64,
+        "Memory": 1.46,
+        "Time": 176.47
+    },
+    "128 Conv 5, LR 0.001, Hidden 12": {
+        "CPU": 94.25,
+        "Memory": 1.46,
+        "Time": 227.97
+    },
+    "129 Conv 5, LR 0.001, Hidden 24": {
+        "CPU": 97.87,
+        "Memory": 1.46,
+        "Time": 187.15
+    },
+    "130 Conv 5, LR 0.001, Hidden 48": {
+        "CPU": 97.73,
+        "Memory": 1.46,
+        "Time": 205.76
+    },
+    "131 Conv 5, LR 0.001, Hidden 64": {
+        "CPU": 98.47,
+        "Memory": 1.46,
+        "Time": 206.88
+    },
+    "132 Conv 5, LR 0.001, Hidden 128": {
+        "CPU": 95.99,
+        "Memory": 1.46,
+        "Time": 240.89
+    },
+    "133 Conv 5, LR 0.0001, Hidden 4": {
+        "CPU": 93.46,
+        "Memory": 1.46,
+        "Time": 389.5
+    },
+    "134 Conv 5, LR 0.0001, Hidden 8": {
+        "CPU": 98.13,
+        "Memory": 1.46,
+        "Time": 180.75
+    },
+    "135 Conv 5, LR 0.0001, Hidden 12": {
+        "CPU": 97.93,
+        "Memory": 1.46,
+        "Time": 181.83
+    },
+    "136 Conv 5, LR 0.0001, Hidden 24": {
+        "CPU": 97.6,
+        "Memory": 1.46,
+        "Time": 189.85
+    },
+    "137 Conv 5, LR 0.0001, Hidden 48": {
+        "CPU": 95.3,
+        "Memory": 1.46,
+        "Time": 206.86
+    },
+    "138 Conv 5, LR 0.0001, Hidden 64": {
+        "CPU": 95.29,
+        "Memory": 1.46,
+        "Time": 938.99
+    },
+    "139 Conv 5, LR 0.0001, Hidden 128": {
+        "CPU": 97.64,
+        "Memory": 1.46,
+        "Time": 239.28
+    },
+    "140 Conv 10, LR 0.1, Hidden 4": {
+        "CPU": 95.54,
+        "Memory": 1.47,
+        "Time": 440.65
+    },
+    "141 Conv 10, LR 0.1, Hidden 8": {
+        "CPU": 97.53,
+        "Memory": 1.47,
+        "Time": 373.71
+    },
+    "142 Conv 10, LR 0.1, Hidden 12": {
+        "CPU": 97.38,
+        "Memory": 1.47,
+        "Time": 386.36
+    },
+    "143 Conv 10, LR 0.1, Hidden 24": {
+        "CPU": 97.09,
+        "Memory": 1.47,
+        "Time": 400.82
+    },
+    "144 Conv 10, LR 0.1, Hidden 48": {
+        "CPU": 97.45,
+        "Memory": 1.47,
+        "Time": 433.84
+    },
+    "145 Conv 10, LR 0.1, Hidden 64": {
+        "CPU": 97.06,
+        "Memory": 1.47,
+        "Time": 450.47
+    },
+    "146 Conv 10, LR 0.1, Hidden 128": {
+        "CPU": 95.71,
+        "Memory": 1.47,
+        "Time": 492.72
+    },
+    "147 Conv 10, LR 0.01, Hidden 4": {
+        "CPU": 97.75,
+        "Memory": 1.47,
+        "Time": 373.6
+    },
+    "148 Conv 10, LR 0.01, Hidden 8": {
+        "CPU": 94.92,
+        "Memory": 0.7,
+        "Time": 384.78
+    },
+    "149 Conv 10, LR 0.01, Hidden 12": {
+        "CPU": 91.86,
+        "Memory": 0.7,
+        "Time": 393.64
+    },
+    "150 Conv 10, LR 0.01, Hidden 24": {
+        "CPU": 97.31,
+        "Memory": 0.71,
+        "Time": 397.9
+    },
+    "151 Conv 10, LR 0.01, Hidden 48": {
+        "CPU": 97.18,
+        "Memory": 0.71,
+        "Time": 431.14
+    },
+    "152 Conv 10, LR 0.01, Hidden 64": {
+        "CPU": 97.39,
+        "Memory": 0.72,
+        "Time": 443.28
+    },
+    "153 Conv 10, LR 0.01, Hidden 128": {
+        "CPU": 97.28,
+        "Memory": 0.66,
+        "Time": 482.73
+    },
+    "154 Conv 10, LR 0.01, Hidden 4": {
+        "CPU": 97.44,
+        "Memory": 0.66,
+        "Time": 371.41
+    },
+    "155 Conv 10, LR 0.01, Hidden 8": {
+        "CPU": 97.41,
+        "Memory": 0.66,
+        "Time": 377.82
+    },
+    "156 Conv 10, LR 0.01, Hidden 12": {
+        "CPU": 97.48,
+        "Memory": 0.67,
+        "Time": 383.08
+    },
+    "157 Conv 10, LR 0.01, Hidden 24": {
+        "CPU": 97.27,
+        "Memory": 0.67,
+        "Time": 410.04
+    },
+    "158 Conv 10, LR 0.01, Hidden 48": {
+        "CPU": 97.33,
+        "Memory": 0.67,
+        "Time": 431.26
+    },
+    "159 Conv 10, LR 0.01, Hidden 64": {
+        "CPU": 97.22,
+        "Memory": 0.67,
+        "Time": 442.89
+    },
+    "160 Conv 10, LR 0.01, Hidden 128": {
+        "CPU": 97.37,
+        "Memory": 0.67,
+        "Time": 481.33
+    },
+    "161 Conv 10, LR 0.001, Hidden 4": {
+        "CPU": 97.43,
+        "Memory": 0.67,
+        "Time": 374.38
+    },
+    "162 Conv 10, LR 0.001, Hidden 8": {
+        "CPU": 97.2,
+        "Memory": 0.67,
+        "Time": 381.76
+    },
+    "163 Conv 10, LR 0.001, Hidden 12": {
+        "CPU": 97.48,
+        "Memory": 0.67,
+        "Time": 384.24
+    },
+    "164 Conv 10, LR 0.001, Hidden 24": {
+        "CPU": 97.31,
+        "Memory": 0.67,
+        "Time": 399.65
+    },
+    "165 Conv 10, LR 0.001, Hidden 48": {
+        "CPU": 97.32,
+        "Memory": 0.68,
+        "Time": 430.01
+    },
+    "166 Conv 10, LR 0.001, Hidden 64": {
+        "CPU": 97.42,
+        "Memory": 0.68,
+        "Time": 445.1
+    },
+    "167 Conv 10, LR 0.001, Hidden 128": {
+        "CPU": 97.05,
+        "Memory": 0.68,
+        "Time": 485.44
+    },
+    "168 Conv 10, LR 0.0001, Hidden 4": {
+        "CPU": 97.38,
+        "Memory": 0.68,
+        "Time": 374.75
+    },
+    "169 Conv 10, LR 0.0001, Hidden 8": {
+        "CPU": 97.4,
+        "Memory": 0.68,
+        "Time": 379.24
+    },
+    "170 Conv 10, LR 0.0001, Hidden 12": {
+        "CPU": 97.5,
+        "Memory": 0.68,
+        "Time": 382.32
+    },
+    "171 Conv 10, LR 0.0001, Hidden 24": {
+        "CPU": 96.72,
+        "Memory": 0.68,
+        "Time": 403.03
+    },
+    "172 Conv 10, LR 0.0001, Hidden 48": {
+        "CPU": 97.17,
+        "Memory": 0.68,
+        "Time": 434.7
+    },
+    "173 Conv 10, LR 0.0001, Hidden 64": {
+        "CPU": 97.37,
+        "Memory": 1.5,
+        "Time": 443.73
+    },
+    "174 Conv 10, LR 0.0001, Hidden 128": {
+        "CPU": 97.45,
+        "Memory": 1.5,
+        "Time": 480.53
+    },
+    "175 Conv 12, LR 0.1, Hidden 4": {
+        "CPU": 97.56,
+        "Memory": 1.5,
+        "Time": 454.58
+    },
+    "176 Conv 12, LR 0.1, Hidden 8": {
+        "CPU": 97.41,
+        "Memory": 1.5,
+        "Time": 460.9
+    },
+    "177 Conv 12, LR 0.1, Hidden 12": {
+        "CPU": 97.38,
+        "Memory": 1.5,
+        "Time": 464.81
+    },
+    "178 Conv 12, LR 0.1, Hidden 24": {
+        "CPU": 97.17,
+        "Memory": 1.5,
+        "Time": 509.5
+    },
+    "179 Conv 12, LR 0.1, Hidden 48": {
+        "CPU": 97.12,
+        "Memory": 1.5,
+        "Time": 544.55
+    },
+    "180 Conv 12, LR 0.1, Hidden 64": {
+        "CPU": 97.43,
+        "Memory": 1.51,
+        "Time": 533.9
+    },
+    "181 Conv 12, LR 0.1, Hidden 128": {
+        "CPU": 97.31,
+        "Memory": 1.5,
+        "Time": 581.65
+    },
+    "182 Conv 12, LR 0.01, Hidden 4": {
+        "CPU": 97.44,
+        "Memory": 1.51,
+        "Time": 454.05
+    },
+    "183 Conv 12, LR 0.01, Hidden 8": {
+        "CPU": 94.76,
+        "Memory": 1.5,
+        "Time": 474.42
+    },
+    "184 Conv 12, LR 0.01, Hidden 12": {
+        "CPU": 90.54,
+        "Memory": 1.5,
+        "Time": 489.53
+    },
+    "185 Conv 12, LR 0.01, Hidden 24": {
+        "CPU": 90.92,
+        "Memory": 1.51,
+        "Time": 513.03
+    },
+    "186 Conv 12, LR 0.01, Hidden 48": {
+        "CPU": 91.05,
+        "Memory": 1.51,
+        "Time": 550.18
+    },
+    "187 Conv 12, LR 0.01, Hidden 64": {
+        "CPU": 91.51,
+        "Memory": 1.51,
+        "Time": 557.04
+    },
+    "188 Conv 12, LR 0.01, Hidden 128": {
+        "CPU": 92.32,
+        "Memory": 1.51,
+        "Time": 599.7
+    },
+    "189 Conv 12, LR 0.01, Hidden 4": {
+        "CPU": 90.36,
+        "Memory": 1.5,
+        "Time": 458.84
+    },
+    "190 Conv 12, LR 0.01, Hidden 8": {
+        "CPU": 92.95,
+        "Memory": 1.5,
+        "Time": 410.63
+    },
+    "191 Conv 12, LR 0.01, Hidden 12": {
+        "CPU": 97.67,
+        "Memory": 1.5,
+        "Time": 336.29
+    },
+    "192 Conv 12, LR 0.01, Hidden 24": {
+        "CPU": 97.46,
+        "Memory": 1.5,
+        "Time": 360.9
+    },
+    "193 Conv 12, LR 0.01, Hidden 48": {
+        "CPU": 97.31,
+        "Memory": 1.5,
+        "Time": 407.57
+    },
+    "194 Conv 12, LR 0.01, Hidden 64": {
+        "CPU": 97.45,
+        "Memory": 1.51,
+        "Time": 416.89
+    },
+    "195 Conv 12, LR 0.01, Hidden 128": {
+        "CPU": 97.51,
+        "Memory": 1.51,
+        "Time": 497.12
+    },
+    "196 Conv 12, LR 0.001, Hidden 4": {
+        "CPU": 97.71,
+        "Memory": 1.51,
+        "Time": 345.16
+    },
+    "197 Conv 12, LR 0.001, Hidden 8": {
+        "CPU": 97.56,
+        "Memory": 1.51,
+        "Time": 357.87
+    },
+    "198 Conv 12, LR 0.001, Hidden 12": {
+        "CPU": 97.66,
+        "Memory": 1.51,
+        "Time": 362.2
+    },
+    "199 Conv 12, LR 0.001, Hidden 24": {
+        "CPU": 97.48,
+        "Memory": 1.51,
+        "Time": 386.81
+    },
+    "200 Conv 12, LR 0.001, Hidden 48": {
+        "CPU": 97.51,
+        "Memory": 1.51,
+        "Time": 422.8
+    },
+    "201 Conv 12, LR 0.001, Hidden 64": {
+        "CPU": 97.4,
+        "Memory": 1.51,
+        "Time": 444.42
+    },
+    "202 Conv 12, LR 0.001, Hidden 128": {
+        "CPU": 97.0,
+        "Memory": 1.51,
+        "Time": 542.87
+    },
+    "203 Conv 12, LR 0.0001, Hidden 4": {
+        "CPU": 97.55,
+        "Memory": 1.51,
+        "Time": 454.24
+    },
+    "204 Conv 12, LR 0.0001, Hidden 8": {
+        "CPU": 97.44,
+        "Memory": 1.51,
+        "Time": 460.8
+    },
+    "205 Conv 12, LR 0.0001, Hidden 12": {
+        "CPU": 97.42,
+        "Memory": 1.51,
+        "Time": 464.85
+    },
+    "206 Conv 12, LR 0.0001, Hidden 24": {
+        "CPU": 97.3,
+        "Memory": 1.51,
+        "Time": 496.4
+    },
+    "207 Conv 12, LR 0.0001, Hidden 48": {
+        "CPU": 96.13,
+        "Memory": 1.51,
+        "Time": 530.31
+    },
+    "208 Conv 12, LR 0.0001, Hidden 64": {
+        "CPU": 95.68,
+        "Memory": 1.52,
+        "Time": 544.55
+    },
+    "209 Conv 12, LR 0.0001, Hidden 128": {
+        "CPU": 97.19,
+        "Memory": 1.52,
+        "Time": 581.34
+    },
+    "210 Conv 20, LR 0.1, Hidden 4": {
+        "CPU": 97.44,
+        "Memory": 1.52,
+        "Time": 768.61
+    },
+    "211 Conv 20, LR 0.1, Hidden 8": {
+        "CPU": 97.5,
+        "Memory": 1.52,
+        "Time": 777.83
+    },
+    "212 Conv 20, LR 0.1, Hidden 12": {
+        "CPU": 95.39,
+        "Memory": 0.74,
+        "Time": 776.48
+    },
+    "213 Conv 20, LR 0.1, Hidden 24": {
+        "CPU": 95.8,
+        "Memory": 0.68,
+        "Time": 801.96
+    },
+    "214 Conv 20, LR 0.1, Hidden 48": {
+        "CPU": 97.13,
+        "Memory": 0.69,
+        "Time": 856.36
+    },
+    "215 Conv 20, LR 0.1, Hidden 64": {
+        "CPU": 92.24,
+        "Memory": 0.67,
+        "Time": 728.56
+    },
+    "216 Conv 20, LR 0.1, Hidden 128": {
+        "CPU": 93.39,
+        "Memory": 0.64,
+        "Time": 958.21
+    },
+    "217 Conv 20, LR 0.01, Hidden 4": {
+        "CPU": 94.03,
+        "Memory": 1.83,
+        "Time": 308.74
+    },
+    "218 Conv 20, LR 0.01, Hidden 8": {
+        "CPU": 97.68,
+        "Memory": 1.83,
+        "Time": 360.81
+    },
+    "219 Conv 20, LR 0.01, Hidden 12": {
+        "CPU": 89.6,
+        "Memory": 1.83,
+        "Time": 366.35
+    },
+    "220 Conv 20, LR 0.01, Hidden 24": {
+        "CPU": 88.85,
+        "Memory": 1.83,
+        "Time": 432.57
+    },
+    "221 Conv 20, LR 0.01, Hidden 48": {
+        "CPU": 90.94,
+        "Memory": 1.76,
+        "Time": 411.56
+    },
+    "222 Conv 20, LR 0.01, Hidden 64": {
+        "CPU": 98.42,
+        "Memory": 1.78,
+        "Time": 422.79
+    },
+    "223 Conv 20, LR 0.01, Hidden 128": {
+        "CPU": 95.23,
+        "Memory": 1.14,
+        "Time": 589.4
+    },
+    "224 Conv 20, LR 0.01, Hidden 4": {
+        "CPU": 98.89,
+        "Memory": 1.13,
+        "Time": 321.98
+    },
+    "231 Conv 20, LR 0.001, Hidden 4": {
+        "CPU": 91.29,
+        "Memory": 1.81,
+        "Time": 308.81
+    },
+    "232 Conv 20, LR 0.001, Hidden 8": {
+        "CPU": 91.6,
+        "Memory": 1.81,
+        "Time": 435.33
+    },
+    "233 Conv 20, LR 0.001, Hidden 12": {
+        "CPU": 91.28,
+        "Memory": 1.82,
+        "Time": 453.27
+    },
+    "234 Conv 20, LR 0.001, Hidden 24": {
+        "CPU": 90.13,
+        "Memory": 1.82,
+        "Time": 499.89
+    },
+    "235 Conv 20, LR 0.001, Hidden 48": {
+        "CPU": 88.47,
+        "Memory": 0.72,
+        "Time": 318.26
+    },
+    "236 Conv 20, LR 0.001, Hidden 64": {
+        "CPU": 87.51,
+        "Memory": 0.74,
+        "Time": 447.65
+    },
+    "237 Conv 20, LR 0.001, Hidden 128": {
+        "CPU": 93.74,
+        "Memory": 0.68,
+        "Time": 780.1
+    },
+    "238 Conv 20, LR 0.0001, Hidden 4": {
+        "CPU": 94.65,
+        "Memory": 0.68,
+        "Time": 563.96
+    },
+    "239 Conv 20, LR 0.0001, Hidden 8": {
+        "CPU": 94.57,
+        "Memory": 0.68,
+        "Time": 578.15
+    },
+    "240 Conv 20, LR 0.0001, Hidden 12": {
+        "CPU": 93.7,
+        "Memory": 0.69,
+        "Time": 557.72
+    },
+    "241 Conv 20, LR 0.0001, Hidden 24": {
+        "CPU": 91.96,
+        "Memory": 0.69,
+        "Time": 543.57
+    },
+    "242 Conv 20, LR 0.0001, Hidden 48": {
+        "CPU": 92.25,
+        "Memory": 0.7,
+        "Time": 646.51
+    },
+    "243 Conv 20, LR 0.0001, Hidden 64": {
+        "CPU": 95.08,
+        "Memory": 0.71,
+        "Time": 721.57
+    },
+    "244 Conv 20, LR 0.0001, Hidden 128": {
+        "CPU": 93.72,
+        "Memory": 1.52,
+        "Time": 763.67
+    },
+    "245 Conv 30, LR 0.1, Hidden 4": {
+        "CPU": 97.38,
+        "Memory": 1.65,
+        "Time": 682.45
+    },
+    "246 Conv 30, LR 0.1, Hidden 8": {
+        "CPU": 98.38,
+        "Memory": 1.65,
+        "Time": 663.98
+    },
+    "247 Conv 30, LR 0.1, Hidden 12": {
+        "CPU": 96.75,
+        "Memory": 1.37,
+        "Time": 787.22
+    },
+    "248 Conv 30, LR 0.1, Hidden 24": {
+        "CPU": 96.05,
+        "Memory": 1.37,
+        "Time": 735.53
+    },
+    "249 Conv 30, LR 0.1, Hidden 48": {
+        "CPU": 97.53,
+        "Memory": 1.39,
+        "Time": 789.61
+    },
+    "250 Conv 30, LR 0.1, Hidden 64": {
+        "CPU": 98.5,
+        "Memory": 1.41,
+        "Time": 812.76
+    },
+    "251 Conv 30, LR 0.1, Hidden 128": {
+        "CPU": 98.57,
+        "Memory": 1.41,
+        "Time": 1070.62
+    },
+    "252 Conv 30, LR 0.01, Hidden 4": {
+        "CPU": 98.18,
+        "Memory": 1.42,
+        "Time": 724.87
+    },
+    "253 Conv 30, LR 0.01, Hidden 8": {
+        "CPU": 95.71,
+        "Memory": 1.42,
+        "Time": 733.07
+    },
+    "254 Conv 30, LR 0.01, Hidden 12": {
+        "CPU": 95.2,
+        "Memory": 1.42,
+        "Time": 731.75
+    },
+    "255 Conv 30, LR 0.01, Hidden 24": {
+        "CPU": 96.61,
+        "Memory": 1.42,
+        "Time": 809.46
+    },
+    "256 Conv 30, LR 0.01, Hidden 48": {
+        "CPU": 97.97,
+        "Memory": 1.42,
+        "Time": 906.2
+    },
+    "257 Conv 30, LR 0.01, Hidden 64": {
+        "CPU": 97.55,
+        "Memory": 1.44,
+        "Time": 1077.23
+    },
+    "258 Conv 30, LR 0.01, Hidden 128": {
+        "CPU": 98.24,
+        "Memory": 1.44,
+        "Time": 1431.02
+    },
+    "259 Conv 30, LR 0.01, Hidden 4": {
+        "CPU": 97.01,
+        "Memory": 1.45,
+        "Time": 1179.7
+    },
+    "260 Conv 30, LR 0.01, Hidden 8": {
+        "CPU": 98.53,
+        "Memory": 1.44,
+        "Time": 1156.06
+    },
+    "261 Conv 30, LR 0.01, Hidden 12": {
+        "CPU": 98.48,
+        "Memory": 1.44,
+        "Time": 1171.46
+    },
+    "262 Conv 30, LR 0.01, Hidden 24": {
+        "CPU": 98.44,
+        "Memory": 1.44,
+        "Time": 1209.36
+    },
+    "263 Conv 30, LR 0.01, Hidden 48": {
+        "CPU": 98.45,
+        "Memory": 1.44,
+        "Time": 1269.51
+    },
+    "264 Conv 30, LR 0.01, Hidden 64": {
+        "CPU": 96.44,
+        "Memory": 1.46,
+        "Time": 1231.03
+    },
+    "275 Conv 30, LR 0.0001, Hidden 12": {
+        "CPU": 96.23,
+        "Memory": 1.05,
+        "Time": 870.47
+    },
+    "276 Conv 30, LR 0.0001, Hidden 24": {
+        "CPU": 97.03,
+        "Memory": 1.07,
+        "Time": 918.58
+    },
+    "277 Conv 30, LR 0.0001, Hidden 48": {
+        "CPU": 96.99,
+        "Memory": 1.14,
+        "Time": 1013.26
+    },
+    "278 Conv 30, LR 0.0001, Hidden 64": {
+        "CPU": 97.63,
+        "Memory": 1.17,
+        "Time": 1189.26
+    },
+    "279 Conv 30, LR 0.0001, Hidden 128": {
+        "CPU": 90.35,
+        "Memory": 1.84,
+        "Time": 1066.36
+    }
+}

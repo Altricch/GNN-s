@@ -40,6 +40,13 @@ from torch_geometric.datasets import Planetoid
 from torch_geometric.data import DataLoader
 
 
+import psutil
+import sys
+from time import sleep, time
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+from ComputationRequirements.compstats import computeStatsModel
+
 # Train
 def train(dataset, conv_layer, writer, epochs, model, lr, hidden_layer, loss_func=None):
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
@@ -131,6 +138,19 @@ def test(loader, model, is_validation=False):
 def conv():
 
     current_filename = os.path.abspath(__file__).split("/")[-1]
+    
+    requirements = {}
+    
+    file_path = 'compare_all.py_requirements.json'
+    if os.path.exists(file_path):
+        print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
+        print(file_path)
+        # Open the file and load the data
+        with open(file_path, 'r') as file:
+            requirements = json.load(file)
+    else:
+        print(current_filename)
+        current_filename + "_requirements.json"
 
     writer = SummaryWriter("./Conv_layer/runs/" + "convcomp")
 
@@ -138,7 +158,25 @@ def conv():
     learning_rates = [0.003]
     hidden_layers = [10, 20, 30]
     models = ["ADGNT", "ADGNF", "GCN", "GAT", "GGNN"]
+    
+    # convs = [1]
+    # learning_rates = [0.003]
+    # hidden_layers = [10]
+    # models = ["ADGNT", "ADGNF"]
+    
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
+    
+    # Get the current process ID
+    pid = os.getpid()
+    # Get the psutil Process object using the PID
+    current_process = psutil.Process(pid)
+    num_cpus = psutil.cpu_count()
+    
+    start_time = time()
+
+    #Prevent CPU 0%
+    computeStatsModel(0, -1, -1, -1, current_process, -1, requirements, "None")
+    counter_conf = 0 
 
     conv_mean_acc = {}
 
@@ -195,6 +233,8 @@ def conv():
                             conv_layers=conv,
                         )
 
+                    conf_start_time = time()
+                    
                     model, mean_accuracy = train(
                         dataset,
                         conv,
@@ -206,7 +246,14 @@ def conv():
                         loss_func=loss_fn,
                     )
                     conv_mean_acc[m].append(mean_accuracy)
+                    
+                    computeStatsModel(conf_start_time, conv, lr, lay, current_process, num_cpus, requirements, m, True, file_path, counter_conf)
+                    counter_conf += 1
 
+    # NEXT LINE ONLY FOR CPU AND MEMORY REQUIREMENTS
+    writer.close()
+    
+    '''
     for j, conv in enumerate(convs):
         writer.add_scalars(
             "test accuracy",
@@ -219,7 +266,8 @@ def conv():
             },
             conv,
         )
-
+        
+    
     averaged_data = {}
 
     # Process each entry in the original data
@@ -245,6 +293,8 @@ def conv():
 
     # Show plot
     plt.show()
+    
+    '''
 
 
 if __name__ == "__main__":

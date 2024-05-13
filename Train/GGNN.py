@@ -18,8 +18,16 @@ from torch import Tensor
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
-import time
 from datetime import datetime
+
+# For CPU/GPU UILITZATION
+import json
+import os
+import sys
+from time import time
+import psutil
+from compstats import computeStats
+
 
 torch.manual_seed(42)
 
@@ -160,7 +168,7 @@ class GGNN(torch.nn.Module):
 
 def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
     ###### SETUP ######
-    start_time = time.time()
+    start_time = time()
     test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
     model = GGNN(
         in_channels=dataset.x.shape[-1], out_channels=32, num_conv=num_conv
@@ -169,6 +177,37 @@ def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
     loss_fn = nn.CrossEntropyLoss()
     tot_loss = 0
     best_acc = [0, 0, 0]
+    
+    # For CPU/GPU UILITZATION
+    current_filename = os.path.abspath(__file__).split("/")[-1]
+    
+    requirements = {}
+
+    # Reimport Dictionary to resume execution
+    #file_path = os.path.join(os.path.pardir, "ADGN_Message.py_requirements.json")
+    file_path = 'Train/comp_per_model/GGNN.py_requirements.json'
+    if os.path.exists(file_path):
+        print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
+        print(file_path)
+        # Open the file and load the data
+        with open(file_path, 'r') as file:
+            requirements = json.load(file)
+    else:
+        print("diuccaro")
+        print(current_filename)
+        current_filename + "_requirements.json"
+    
+    
+    pid = os.getpid()
+    # Get the psutil Process object using the PID
+    current_process = psutil.Process(pid)
+    num_cpus = psutil.cpu_count()
+    
+    start_time = time()
+    computeStats(start_time,-1, current_process, -1, requirements)
+    
+    ###########################
+    
 
     print("#" * 100 + "\n")
     print("[MODEL REPRESENTATION]", repr(model))
@@ -183,6 +222,9 @@ def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
         print(f"Processing Epoch {epoch}", end="\r")
         epoch_start_time = datetime.now()
         model.train()
+        
+        # For CPU/GPU UILITZATION
+        computeStats(start_time, epoch-1, current_process, num_cpus, requirements)
 
         for batch in loader:
             optimizer.zero_grad()
@@ -239,12 +281,16 @@ def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
                 )
             )
 
-    print("Training Completed in {:.2f} seconds".format(time.time() - start_time))
+    print("Training Completed in {:.2f} seconds".format(time() - start_time))
     print(
         "Best Accuracies Train Acc: {:.0%}, Val Acc: {:.0%}, Test Acc: {:.0%}".format(
             best_acc[0], best_acc[1], best_acc[2]
         )
     )
+    
+    # For CPU/GPU UILITZATION
+    with open(file_path, "w") as json_file:
+        json.dump(requirements, json_file, indent=4)
 
     return model
 
@@ -314,8 +360,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    epochs = args.epoch
-    convs = args.conv
+    epochs = 100
+    convs = 3
 
     model = train(dataset, epochs=epochs, num_conv=convs, learning_rate=0.001)
     model.__repr__()

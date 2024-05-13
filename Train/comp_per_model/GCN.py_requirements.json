@@ -1,0 +1,507 @@
+{
+    "Epoch -1": {
+        "CPU": -0.0,
+        "Memory": 1.46,
+        "Time": 0.0
+    },
+    "Epoch 0": {
+        "CPU": 8.33,
+        "Memory": 1.46,
+        "Time": 0.01
+    },
+    "Epoch 1": {
+        "CPU": 8.12,
+        "Memory": 1.71,
+        "Time": 0.54
+    },
+    "Epoch 2": {
+        "CPU": 8.28,
+        "Memory": 1.46,
+        "Time": 0.82
+    },
+    "Epoch 3": {
+        "CPU": 7.86,
+        "Memory": 1.71,
+        "Time": 1.16
+    },
+    "Epoch 4": {
+        "CPU": 8.27,
+        "Memory": 1.71,
+        "Time": 1.47
+    },
+    "Epoch 5": {
+        "CPU": 8.25,
+        "Memory": 1.7,
+        "Time": 1.74
+    },
+    "Epoch 6": {
+        "CPU": 8.26,
+        "Memory": 1.7,
+        "Time": 2.05
+    },
+    "Epoch 7": {
+        "CPU": 8.29,
+        "Memory": 1.7,
+        "Time": 2.35
+    },
+    "Epoch 8": {
+        "CPU": 8.3,
+        "Memory": 1.7,
+        "Time": 2.65
+    },
+    "Epoch 9": {
+        "CPU": 8.3,
+        "Memory": 1.7,
+        "Time": 2.93
+    },
+    "Epoch 10": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 3.14
+    },
+    "Epoch 11": {
+        "CPU": 8.3,
+        "Memory": 1.7,
+        "Time": 3.54
+    },
+    "Epoch 12": {
+        "CPU": 8.29,
+        "Memory": 1.47,
+        "Time": 3.79
+    },
+    "Epoch 13": {
+        "CPU": 8.3,
+        "Memory": 1.7,
+        "Time": 4.06
+    },
+    "Epoch 14": {
+        "CPU": 8.32,
+        "Memory": 1.7,
+        "Time": 4.3
+    },
+    "Epoch 15": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 4.51
+    },
+    "Epoch 16": {
+        "CPU": 8.3,
+        "Memory": 1.7,
+        "Time": 4.79
+    },
+    "Epoch 17": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 5.03
+    },
+    "Epoch 18": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 5.24
+    },
+    "Epoch 19": {
+        "CPU": 8.31,
+        "Memory": 1.7,
+        "Time": 5.49
+    },
+    "Epoch 20": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 5.71
+    },
+    "Epoch 21": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 6.05
+    },
+    "Epoch 22": {
+        "CPU": 8.28,
+        "Memory": 1.47,
+        "Time": 6.29
+    },
+    "Epoch 23": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 6.5
+    },
+    "Epoch 24": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 6.7
+    },
+    "Epoch 25": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 6.9
+    },
+    "Epoch 26": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 7.1
+    },
+    "Epoch 27": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 7.31
+    },
+    "Epoch 28": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 7.51
+    },
+    "Epoch 29": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 7.72
+    },
+    "Epoch 30": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 7.92
+    },
+    "Epoch 31": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 8.23
+    },
+    "Epoch 32": {
+        "CPU": 8.3,
+        "Memory": 1.47,
+        "Time": 8.48
+    },
+    "Epoch 33": {
+        "CPU": 8.28,
+        "Memory": 1.7,
+        "Time": 8.75
+    },
+    "Epoch 34": {
+        "CPU": 8.26,
+        "Memory": 1.7,
+        "Time": 9.06
+    },
+    "Epoch 35": {
+        "CPU": 8.25,
+        "Memory": 1.7,
+        "Time": 9.37
+    },
+    "Epoch 36": {
+        "CPU": 8.29,
+        "Memory": 1.7,
+        "Time": 9.65
+    },
+    "Epoch 37": {
+        "CPU": 8.32,
+        "Memory": 1.7,
+        "Time": 9.86
+    },
+    "Epoch 38": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 10.07
+    },
+    "Epoch 39": {
+        "CPU": 8.35,
+        "Memory": 1.7,
+        "Time": 10.28
+    },
+    "Epoch 40": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 10.49
+    },
+    "Epoch 41": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 10.8
+    },
+    "Epoch 42": {
+        "CPU": 8.28,
+        "Memory": 1.47,
+        "Time": 11.04
+    },
+    "Epoch 43": {
+        "CPU": 8.32,
+        "Memory": 1.7,
+        "Time": 11.26
+    },
+    "Epoch 44": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 11.47
+    },
+    "Epoch 45": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 11.68
+    },
+    "Epoch 46": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 11.9
+    },
+    "Epoch 47": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 12.11
+    },
+    "Epoch 48": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 12.32
+    },
+    "Epoch 49": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 12.52
+    },
+    "Epoch 50": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 12.72
+    },
+    "Epoch 51": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 13.03
+    },
+    "Epoch 52": {
+        "CPU": 8.33,
+        "Memory": 1.47,
+        "Time": 13.24
+    },
+    "Epoch 53": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 13.45
+    },
+    "Epoch 54": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 13.66
+    },
+    "Epoch 55": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 13.86
+    },
+    "Epoch 56": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 14.07
+    },
+    "Epoch 57": {
+        "CPU": 8.27,
+        "Memory": 1.7,
+        "Time": 14.34
+    },
+    "Epoch 58": {
+        "CPU": 8.3,
+        "Memory": 1.7,
+        "Time": 14.59
+    },
+    "Epoch 59": {
+        "CPU": 8.28,
+        "Memory": 1.7,
+        "Time": 14.87
+    },
+    "Epoch 60": {
+        "CPU": 8.31,
+        "Memory": 1.7,
+        "Time": 15.15
+    },
+    "Epoch 61": {
+        "CPU": 8.32,
+        "Memory": 1.7,
+        "Time": 15.52
+    },
+    "Epoch 62": {
+        "CPU": 8.33,
+        "Memory": 1.47,
+        "Time": 15.73
+    },
+    "Epoch 63": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 15.94
+    },
+    "Epoch 64": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 16.15
+    },
+    "Epoch 65": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 16.35
+    },
+    "Epoch 66": {
+        "CPU": 8.35,
+        "Memory": 1.7,
+        "Time": 16.56
+    },
+    "Epoch 67": {
+        "CPU": 8.31,
+        "Memory": 1.7,
+        "Time": 16.79
+    },
+    "Epoch 68": {
+        "CPU": 8.29,
+        "Memory": 1.7,
+        "Time": 17.04
+    },
+    "Epoch 69": {
+        "CPU": 8.32,
+        "Memory": 1.7,
+        "Time": 17.28
+    },
+    "Epoch 70": {
+        "CPU": 8.31,
+        "Memory": 1.7,
+        "Time": 17.5
+    },
+    "Epoch 71": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 17.81
+    },
+    "Epoch 72": {
+        "CPU": 8.32,
+        "Memory": 1.47,
+        "Time": 18.03
+    },
+    "Epoch 73": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 18.23
+    },
+    "Epoch 74": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 18.44
+    },
+    "Epoch 75": {
+        "CPU": 8.31,
+        "Memory": 1.7,
+        "Time": 18.66
+    },
+    "Epoch 76": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 18.86
+    },
+    "Epoch 77": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 19.07
+    },
+    "Epoch 78": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 19.27
+    },
+    "Epoch 79": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 19.48
+    },
+    "Epoch 80": {
+        "CPU": 8.28,
+        "Memory": 1.7,
+        "Time": 19.74
+    },
+    "Epoch 81": {
+        "CPU": 8.31,
+        "Memory": 1.7,
+        "Time": 20.12
+    },
+    "Epoch 82": {
+        "CPU": 8.33,
+        "Memory": 1.47,
+        "Time": 20.36
+    },
+    "Epoch 83": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 20.56
+    },
+    "Epoch 84": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 20.77
+    },
+    "Epoch 85": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 20.97
+    },
+    "Epoch 86": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 21.17
+    },
+    "Epoch 87": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 21.38
+    },
+    "Epoch 88": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 21.58
+    },
+    "Epoch 89": {
+        "CPU": 8.34,
+        "Memory": 1.7,
+        "Time": 21.78
+    },
+    "Epoch 90": {
+        "CPU": 8.35,
+        "Memory": 1.7,
+        "Time": 21.98
+    },
+    "Epoch 91": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 22.28
+    },
+    "Epoch 92": {
+        "CPU": 8.33,
+        "Memory": 1.47,
+        "Time": 22.5
+    },
+    "Epoch 93": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 22.7
+    },
+    "Epoch 94": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 22.93
+    },
+    "Epoch 95": {
+        "CPU": 8.35,
+        "Memory": 1.7,
+        "Time": 23.13
+    },
+    "Epoch 96": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 23.34
+    },
+    "Epoch 97": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 23.54
+    },
+    "Epoch 98": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 23.75
+    },
+    "Epoch 99": {
+        "CPU": 8.33,
+        "Memory": 1.7,
+        "Time": 23.95
+    }
+}
