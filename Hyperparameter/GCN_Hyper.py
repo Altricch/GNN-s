@@ -226,36 +226,6 @@ def test(loader, model, is_validation=False):
     return correct / total
 
 
-def visualization_nodembs(dataset, model):
-    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-
-    loader = DataLoader(dataset, batch_size=64, shuffle=True)
-
-    embs = []
-    colors = []
-
-    for batch in loader:
-
-
-        emb, pred = model(batch)
-
-        embs.append(emb)
-
-        # Collect the colors based on the ground truth
-        colors += [color_list[y] for y in batch.y]
-
-    # Concatenate the embeddings
-    embs = torch.cat(embs, dim=0)
-
-    # Get the 2D representation of the embeddings
-    xs, ys = zip(*TSNE().fit_transform(embs.detach().numpy()))
-
-    # Plot the 2D representation
-    plt.scatter(xs, ys, color=colors)
-    plt.title(
-        f"GCN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%"
-    )
-    plt.show()
 
 
 def hyperparameter_search():
@@ -307,13 +277,6 @@ def hyperparameter_search():
     with open(current_filename + "_config.json", "w") as json_file:
         json.dump(configs, json_file, indent=4)
 
-
-### Flags Areas ###
-import argparse
-
-parser = argparse.ArgumentParser(description="Process some inputs.")
-parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
-parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
 
 if __name__ == "__main__":
 

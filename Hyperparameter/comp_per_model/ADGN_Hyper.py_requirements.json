@@ -1,13 +1,13 @@
 {
     "0 Conv 1, LR 0.1, Hidden 4": {
-        "CPU": 77.94,
-        "Memory": 1.81,
-        "Time": 5.79
+        "CPU": 8.29,
+        "Memory": 1.47,
+        "Time": 2.65
     },
     "1 Conv 1, LR 0.1, Hidden 8": {
-        "CPU": 79.23,
-        "Memory": 1.82,
-        "Time": 7.22
+        "CPU": 8.23,
+        "Memory": 1.48,
+        "Time": 2.54
     },
     "2 Conv 1, LR 0.1, Hidden 12": {
         "CPU": 61.92,

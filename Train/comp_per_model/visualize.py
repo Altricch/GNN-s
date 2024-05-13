@@ -39,7 +39,7 @@ plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels
 plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(5)) 
 plt.tight_layout()  # Adjust layout to prevent overlap
 plt.grid(True)
-plt.savefig("cpu_comparison.png")
+plt.savefig("Train/comp_per_model/cpu_comparison.png")
 plt.show()
 
 # Plot and save Memory comparison
@@ -54,7 +54,7 @@ plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels
 plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(5)) 
 plt.tight_layout()  # Adjust layout to prevent overlap
 plt.grid(True)
-plt.savefig("memory_comparison.png")
+plt.savefig("Train/comp_per_model/memory_comparison.png")
 plt.show()
 
 # Plot and save Time taken comparison
@@ -69,5 +69,5 @@ plt.xticks(rotation=45, ha='right')  # Rotate x-axis labels
 plt.gca().xaxis.set_major_locator(ticker.MultipleLocator(5)) 
 plt.tight_layout()  # Adjust layout to prevent overlap
 plt.grid(True)
-plt.savefig("time_comparison.png")
+plt.savefig("Train/comp_per_model/time_comparison.png")
 plt.show()

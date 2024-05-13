@@ -11,7 +11,7 @@ np.set_printoptions(suppress=True, precision=4)
 
 # Importing the file
 data = {}
-file_path = "ADGN_Message.py_requirements.json"
+file_path = "Hyperparameter/comp_per_model/ADGN_Message.py_requirements.json"
 if os.path.exists(file_path):
     # Open the file and load the data
     with open(file_path, "r") as file:
@@ -48,7 +48,7 @@ columns = [
     "Execution Time",
 ]
 df_time = pd.DataFrame(data=df_data_time, columns=columns)
-print(df_time)
+# print(df_time)
 
 fig = px.parallel_coordinates(
     df_time,
@@ -66,7 +66,7 @@ fig.show()
 df_data_cpu = np.concatenate([configs, values[:, :1]], axis=1).astype(float)
 columns = ["Hidden Dimension", "Learning Rate", "Convolutional Layers", "CPU Usage"]
 df_time = pd.DataFrame(data=df_data_cpu, columns=columns)
-print(df_time)
+# print(df_time)
 
 fig = px.parallel_coordinates(
     df_time,
@@ -84,7 +84,7 @@ fig.show()
 df_data_mem = np.concatenate([configs, values[:, 1:2]], axis=1).astype(float)
 columns = ["Hidden Dimension", "Learning Rate", "Convolutional Layers", "Memory Usage"]
 df_time = pd.DataFrame(data=df_data_mem, columns=columns)
-print(df_time)
+# print(df_time)
 
 fig = px.parallel_coordinates(
     df_time,

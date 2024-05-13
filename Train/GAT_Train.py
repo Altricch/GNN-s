@@ -107,6 +107,8 @@ class GAT(nn.Module):
 
         # Apply the linear transformation
         x = self.emb(x)
+        
+        emb = x
 
         x = F.dropout(x, p=self.dropout, training=self.training)
 
@@ -118,7 +120,7 @@ class GAT(nn.Module):
         # Apply the GAT layer 2
         x = self.conv2(x, edge_index)
 
-        return F.log_softmax(x, dim=1)
+        return emb, F.log_softmax(x, dim=1)
 
 
 # Train the model
@@ -181,7 +183,7 @@ def train(dataset, hidden_dim, writer, epochs, heads):
 
             opt.zero_grad()
 
-            pred = model(batch)
+            emb, pred = model(batch)
             label = batch.y
 
             # Node classification: only compute loss for nodes in the training set
@@ -232,7 +234,7 @@ def test(loader, model, is_validation=False):
     for data in loader:
         with torch.no_grad():
 
-            pred = model(data)
+            emb, pred = model(data)
 
             pred = pred.argmax(dim=1)
 
@@ -253,6 +255,35 @@ def test(loader, model, is_validation=False):
             total += torch.sum(data.test_mask).item()
     return correct / total
 
+# Clustering the node embeddings
+def visualization_nodembs(dataset, model):
+
+    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
+    loader = DataLoader(dataset, batch_size=1, shuffle=False)
+
+    embs = []
+    colors = []
+
+    for batch in loader:
+
+        emb, pred = model(batch)
+        embs.append(emb)
+
+        colors += [color_list[y] for y in batch.y]
+
+    embs = torch.cat(embs, dim=0)
+
+    # Get 2D representation of embeddings
+    xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
+
+    # Plot the 2D representation
+    plt.scatter(xs, ys, color=colors)
+    plt.title(
+        f"GAT, #epoch:{str(args.epoch)}, #heads:{str(args.heads)}\n accuracy:{model.best_accuracy*100}%"
+    )
+    plt.show()
+
+
 
 ### Flags Areas ###
 parser = argparse.ArgumentParser(description="Process some inputs.")
@@ -271,3 +302,5 @@ if __name__ == "__main__":
     epochs = args.epoch
     hidden_dim = args.hidden
     model = train(dataset, hidden_dim, writer, epochs, heads)
+    
+    visualization_nodembs(dataset, model)

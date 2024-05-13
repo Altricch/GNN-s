@@ -12,6 +12,7 @@ We assume Miniconda/Anaconda is installed.
 
 ### Repository Structure
 Since time constraints, please note that our code has a lot of content reduncency which has to be clean up in future iterations (e.g, having one file for each model, one train/test loop, etc...).
+For each runnable file, we assume you are in the root of the project.
 The repository is structured as follows:
 
     ├── README.md                                  <- The top-level README.
@@ -20,7 +21,7 @@ The repository is structured as follows:
     |
     ├── ComputationRequirements                    <-  Folder that contains the script for calculating CPU, Memory and Time consumption.
     │    |
-    |    ├── compstats.py                          <- Script that calculates CPU, Memory and Time consumption, storing the data in a json.
+    |    ├── compstats.py (not runnable)           <- Script that calculates CPU, Memory and Time consumption, storing the data in a json.
     │
     ├── Conv_layer                                 <-  Folder to prof or disprove whether a increase in depth in the model architecture leads to a decay in accuracy of not.
     |    |
@@ -35,34 +36,37 @@ The repository is structured as follows:
     |    |    ├── Memory_vs_Convolution.png        <- Memory consumption over convolutional layers.
     |    |    |
     |    │    ├── requirements_plot.py             <- Script that produces the requirements consumption's visualizations.
+    |    |    |                                       (python3 Conv_layer/comp_per_model/requirements_plot.py)             
     |    |    |
     |    |    ├── Time_vs_Convolutions.png         <- Time consumption over convolutional layers.
     │    |
-    |    ├── ADGN_Message.py                       <- A-DGN architecture.
+    |    ├── ADGN_Message.py (not runnable)        <- A-DGN architecture.
     │    |
-    │    ├── compare_all.py                        <- Script that runs the comparison, store the accuracies, store the requirements, and produces the visualization conv_mean_acc_plot.png.
+    │    ├── compare_all.py                        <- Script that runs the comparison, store the accuracies, store the requirements, and produces the visualization 
+    |    |                                             (python3 Conv_layer/compare_all.py)
     |    |
     |    ├── conv_mean_acc_plot.png                <- Accuracy plot with an increase number of layers for each model.
     │    |
-    │    ├── GAT.py                                <- GAT architecture.
+    │    ├── GAT.py (not runnable)                 <- GAT architecture.
     |    |
-    │    ├── GCN.py                                <- GCN architecture.
+    │    ├── GCN.py (not runnable)                 <- GCN architecture.
     |    |
-    │    ├── GGNN.py                               <- GGNN architecture.
-    │
+    │    ├── GGNN.py (not runnable)                <- GGNN architecture.
+    │    
     ├── GNN_Basics                                 <- Basic examples for our understanding.
     |   |
-    |   ├── CustomConv.py                          <- Standard implementation for a graph convolution.
+    |   ├── CustomConv.py (not runnable)           <- Standard implementation for a graph convolution.
     │   |
-    │   ├── GNN.py                                 <- Standard implementation of a Graph Neural Network.
+    │   ├── GNN.py                                 <- Standard implementation of a Graph Neural Network on Cora.
+    |                                                 (python3 GNN_basics/GNN.py)
     |   
     ├── Hyperparameter                             <- Folder for hyperparameter space search and corresponding visualization/results.
     |   |
     |   ├── comp_per_model                         <- Folder that contains the script that procedus json, plots.
     |   |   |
-    |   |   ├── ADGN_Message.py_config.json        <- JSON file with best configuration per convolution layer amount.
+    |   |   ├── ADGN_Hyper.py_config.json          <- JSON file with best configuration per convolution layer amount.
     |   |   |
-    |   |   ├── ADGN_Message.py_requirements.json  <- Resources utilization per config.
+    |   |   ├── ADGN_Hyper.py_requirements.json    <- Resources utilization per config.
     |   |   |
     |   |   ├── ADGN.png                           <- Plot of ADGN_MEssage.py_config.json.
     |   |   |
@@ -70,19 +74,32 @@ The repository is structured as follows:
     |   |   |
     |   |   ├── GCN.png                            <- Plot of GCN.py_config.json.
     |   |   |
-    |   |   ├── GCN.py_config.json                 <- JSON file with best configuration per convolution layer amount.
+    |   |   ├── GCN_Hyper.py_config.json           <- JSON file with best configuration per convolution layer amount.
     |   |   |
     |   |   ├── gridgrid_search_plotter.py         <- Script that plots hardware utilization.
+    |   |   |                                         (python3 Hyperparameter/comp_per_model/grid_search_plotter.py)
     |   |   |
     |   |   ├── Memory.png                         <- Memory usage.
     |   |   |
     |   |   ├── Time.png                           <- Time exectuion time.
     |   |   |
     |   |   ├── visualization.py                   <- Script that plots hyperparameter space search.
+    |   |                                             (python3 Hyperparameter/comp_per_model/visualization.py)
     |   |   
-    |   ├── ADGN_Message.py                        <- ADGN architecture.
+    |   ├── ADGN_Hyper.py                          <- ADGN architecture.
+    |   |                                             (python3 Hyperparameter/ADGN_Hyper.py)
     |   |
-    |   ├── GCN.py                                 <- GCN architecture.
+    |   ├── GCN_Hyper.py                           <- GCN architecture.
+    |                                                 (python3 Hyperparameter/GCN_Hyper.py)
+    |
+    ├── Jacobian                                   <- Folder that tests the claims of the paper.
+    |   |
+    |   ├── ADGN_Jacobian.py                       <- Script that calculates the real part of the Jacobian on random nodes.
+    |   |                                            (python3 Jacobian/ADGN_Jacobian.py)
+    |   |
+    |   ├── max_eigenvalues.csv                    <- CSV file with the max eigenvalues over epochs.
+    |   |
+    |   ├── max_eigenvalues.png                    <- Plot of the max eigenvalues over epochs with anti symmetric both True and False
     |
     ├── Model_Papers_PDF                           <- PDFs Folder.
     |   |
@@ -111,13 +128,19 @@ The repository is structured as follows:
     |   |  ├── time_comparison.png                 <- Comparative execution time.
     |   |  |
     |   |  ├── visualize.py                        <- Plotting script.
+    |   |                                             (python3 Train/comp_per_model/visualize.py)
     |   |
-    |   ├── ADGN_Message.py                        <- ADGN architecture.
+    |   ├── ADGN_Train.py                          <- ADGN simple train + visualization of clustering of model output.
+    |   |                                             (python3 Train/ADGN_Train.py)
     |   |
-    |   ├── compstats.py                           <- Script that calculates CPU, Memory and Time consumption, storing the data in a JSON
+    |   ├── compstats.py                           <- Script that computes CPU, Memory and Time and storing those in a JSON
+    |   |                                             (python3 Train/compostats.py)
     |   |
-    |   ├── GAT.py                                 <- GAT architecture.
+    |   ├── GAT_Train.py                           <- GAT simple train + visualization of clustering of model output.
+    |   |                                             (python3 Train/GAT_Train.py)
     |   |
-    |   ├── GCN.py                                 <- GCN architecture.
+    |   ├── GCN_Train.py                           <- GCN simple train + visualization of clustering of model output.
+    |   |                                             (python3 Train/GCN_Train.py)
     |   |
-    |   ├── GGNN.py                                <- GGNN architecture.
+    |   ├── GGNN_Train.py                           <- GGNN simple train + visualization of clustering of model output.
+    |   |                                             (python3 Train/GGNN_Train.py)

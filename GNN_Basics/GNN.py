@@ -259,9 +259,9 @@ def visualization_nodembs(dataset, model):
 if __name__ == "__main__":
 
     # Node classification
-    writer = SummaryWriter("./log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
+    writer = SummaryWriter("GNN_Basics/log/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/cora", name="cora")
     task = "node"
     conv_layer = 6
-    model = train(dataset, task, conv_layer, writer, 1000)
+    model = train(dataset, task, conv_layer, writer, 100)
     visualization_nodembs(dataset, model)

@@ -6,6 +6,7 @@ with open("Hyperparameter/comp_per_model/GCN.py_config.json", "r") as file:
 
 
 name = "GCN"
+path = "Hyperparameter/comp_per_model/"
 
 # Load JSON data into Python dictionary
 data = json.loads(json_data)
@@ -17,7 +18,7 @@ learning_rates = [entry["LR"] for entry in data.values()]
 hidden_dims = [entry["Hidden"] for entry in data.values()]
 
 # Plot the data
-fig, ax1 = plt.subplots()
+fig, ax1 = plt.subplots(figsize=(16,9))
 
 # Plot Accuracy
 color = "tab:blue"
@@ -54,5 +55,5 @@ plt.title(
     loc="center",
 )
 # Save the plot as an image
-plt.savefig(name + ".png", bbox_inches="tight")
+plt.savefig(path + name + ".png", bbox_inches="tight")
 plt.show()

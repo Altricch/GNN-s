@@ -204,36 +204,6 @@ class ADGN(nn.Module):
         return emb, x
 
 
-# Cluster the node embeddings
-def visualization_nodembs(dataset, model):
-
-    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-
-    loader = DataLoader(dataset, batch_size=1, shuffle=False)
-
-    embs = []
-    colors = []
-
-    for batch in loader:
-        emb, pred = model(batch)
-
-        embs.append(emb)
-
-        colors += [color_list[y] for y in batch.y]
-
-    embs = torch.cat(embs, dim=0)
-
-    # Get 2D representation of node embeddings
-    xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
-
-    # Plot the 2D representation
-    plt.scatter(xs, ys, color=colors)
-    plt.title(
-        f"ADGN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_accuracy*100}%, symmetry {model.antisymmetry}"
-    )
-    plt.show()
-
-
 # Train the model
 def train(
     dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32, anti_symmetric=True
@@ -357,7 +327,7 @@ def hyperparameter_search():
 
     # Reimport Dictionary to resume execution
     #file_path = os.path.join(os.path.pardir, "ADGN_Message.py_requirements.json")
-    file_path = 'comp_per_model/ADGN_Message.py_requirements.json'
+    file_path = 'Hyperparameter/comp_per_model/ADGN_Hyper.py_requirements.json'
     if os.path.exists(file_path):
         print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
         print(file_path)
@@ -400,9 +370,6 @@ def hyperparameter_search():
             for lay in hidden_layers:
                 
                 conf_start_time = time()
-                if (counter_conf < 279):
-                    counter_conf +=1
-                    continue
                 
                 # Train model and get best accuracy
                 print(f"\n[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
@@ -435,18 +402,8 @@ def hyperparameter_search():
     with open(file_path, "w") as json_file:
         json.dump(requirements, json_file, indent=4)
 
-
-### Flags Areas ###
-import argparse
-
-parser = argparse.ArgumentParser(description="Process some inputs.")
-parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
-parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
-parser.add_argument("--asym", type=bool, help="Use AntiSymmetric Weights", default=1)
-
 if __name__ == "__main__":
 
-    args = parser.parse_args()
 
     # Your grid search code here
     hyperparameter_search()
