@@ -11,6 +11,7 @@ We assume Miniconda/Anaconda is installed.
     `conda install --file requirements.txt`
 
 ### Repository Structure
+Since time constraints, please note that our code has a lot of content reduncency which has to be clean up in future iterations (e.g, having one file for each model, one train/test loop, etc...).
 The repository is structured as follows:
 
     ├── README.md                                  <- The top-level README.
@@ -40,6 +41,7 @@ The repository is structured as follows:
     |    ├── ADGN_Message.py                       <- A-DGN architecture.
     │    |
     │    ├── compare_all.py                        <- Script that runs the comparison, store the accuracies, store the requirements, and produces the visualization conv_mean_acc_plot.png.
+    |    |
     |    ├── conv_mean_acc_plot.png                <- Accuracy plot with an increase number of layers for each model.
     │    |
     │    ├── GAT.py                                <- GAT architecture.
@@ -54,48 +56,68 @@ The repository is structured as follows:
     │   |
     │   ├── GNN.py                                 <- Standard implementation of a Graph Neural Network.
     |   
-
-
-    ├── Hyperparameter                  <- Folder for grid-search and corresponding visualization/results.
+    ├── Hyperparameter                             <- Folder for hyperparameter space search and corresponding visualization/results.
     |   |
-    |   ├── ADGN_Message                <- Script that performs grid-search for ADGN.
+    |   ├── comp_per_model                         <- Folder that contains the script that procedus json, plots.
+    |   |   |
+    |   |   ├── ADGN_Message.py_config.json        <- JSON file with best configuration per convolution layer amount.
+    |   |   |
+    |   |   ├── ADGN_Message.py_requirements.json  <- Resources utilization per config.
+    |   |   |
+    |   |   ├── ADGN.png                           <- Plot of ADGN_MEssage.py_config.json.
+    |   |   |
+    |   |   ├── CPU.png                            <- CPU usage.
+    |   |   |
+    |   |   ├── GCN.png                            <- Plot of GCN.py_config.json.
+    |   |   |
+    |   |   ├── GCN.py_config.json                 <- JSON file with best configuration per convolution layer amount.
+    |   |   |
+    |   |   ├── gridgrid_search_plotter.py         <- Script that plots hardware utilization.
+    |   |   |
+    |   |   ├── Memory.png                         <- Memory usage.
+    |   |   |
+    |   |   ├── Time.png                           <- Time exectuion time.
+    |   |   |
+    |   |   ├── visualization.py                   <- Script that plots hyperparameter space search.
+    |   |   
+    |   ├── ADGN_Message.py                        <- ADGN architecture.
     |   |
-    |   ├── ADGN_MEssage.py_config.json <- JSON file for ADGN.py that stores for each number of convolutional layers the best learning rate, hidden dimension and accuracy.
-    |   |
-    |   ├── ADGN.png                    <- Plot of ADGN_MEssage.py_config.json.
-    |   |
-    |   ├── GCN.png                     <- Plot of GCN.py_config.json.
-    |   |
-    |   ├── GCN.py                      <- Script that performs grid-search for GCN.
-    |   |
-    |   ├── GCN.py_config.json          <- JSON file for GCN.py that stores for each number of convolutional layers the best learning rate, hidden dimension and accuracy.
-    |   |
-    |   ├── visualization.py            <- Script that generates both GCN.png and ADGN.png.
+    |   ├── GCN.py                                 <- GCN architecture.
     |
-
-
-
-
-
-
-
-
-    ├── PDFs                             <- PDFs Folder.
+    ├── PDFs                                       <- PDFs Folder.
     |   |
-    |   ├── ADGN.pdf                    <- ADGN paper.
+    |   ├── ADGN.pdf                               <- ADGN paper.
     |   |
-    |   ├── GAT.pdf                     <- GAT paper.
+    |   ├── GAT.pdf                                <- GAT paper.
     |   |
-    |   ├── GGNN.pdf                    <- GGNN paper.
+    |   ├── GGNN.pdf                               <- GGNN paper.
     |
-    ├── Train                           <- Folder with our models for simple training and script correctness.
+    ├── Train                                      <- Folder with our models for simple training and script correctness.
     |   |
-    |   ├── ADGN_Message.py             <- ADGN.
+    |   ├── comp_per_model                         <- Folder that contains comparison JSON files and plots.
+    |   |  |
+    |   |  ├── ADGN_Message.py_requirements.json   <- ADGN JSON file for CPU, Memory and Time consumption per epoch.
+    |   |  |
+    |   |  ├── cpu_comparison.png                  <- Comparative CPU usage.
+    |   |  |
+    |   |  ├── GAT.py_requirements.json            <- GAT JSON file for CPU, Memory and Time consumption per epoch.
+    |   |  |
+    |   |  ├── GCN.py_requirements.json            <- GCN JSON file for CPU, Memory and Time consumption per epoch.
+    |   |  |
+    |   |  ├── GGNN.py_requirements.json           <- GGNN JSON file for CPU, Memory and Time consumption per epoch.
+    |   |  |
+    |   |  ├── memory_comparison.png               <- Comparative Memory usage.
+    |   |  |
+    |   |  ├── time_comparison.png                 <- Comparative execution time.
+    |   |  |
+    |   |  ├── visualize.py                        <- Plotting script.
     |   |
-    |   ├── GAT.py                      <- GAT.
+    |   ├── ADGN_Message.py                        <- ADGN architecture.
     |   |
-    |   ├── GCN.py                      <- GCN.
+    |   ├── compstats.py                           <- Script that calculates CPU, Memory and Time consumption, storing the data in a JSON
     |   |
-    |   ├── GGNN.py                     <- GGNN.
-
-Since time constraints, note that
+    |   ├── GAT.py                                 <- GAT architecture.
+    |   |
+    |   ├── GCN.py                                 <- GCN architecture.
+    |   |
+    |   ├── GGNN.py                                <- GGNN architecture.

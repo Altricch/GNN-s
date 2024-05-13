@@ -258,7 +258,7 @@ def test(loader, model, is_validation=False):
 parser = argparse.ArgumentParser(description="Process some inputs.")
 parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
 parser.add_argument("--hidden", type=int, help="Hidden Dimension", default=32)
-parser.add_argument("--heads", type=int, help="Use number of heads", default=33)
+parser.add_argument("--heads", type=int, help="Use number of heads", default=3)
 
 
 if __name__ == "__main__":
