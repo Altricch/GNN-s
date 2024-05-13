@@ -84,7 +84,7 @@ The repository is structured as follows:
     |   |
     |   ├── GCN.py                                 <- GCN architecture.
     |
-    ├── PDFs                                       <- PDFs Folder.
+    ├── Model_Papers_PDF                           <- PDFs Folder.
     |   |
     |   ├── ADGN.pdf                               <- ADGN paper.
     |   |

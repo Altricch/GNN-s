@@ -1,3 +1,5 @@
 PubMed
+data/*
 test.py
 .idea/*
+__pycache__/*
