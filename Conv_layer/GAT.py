@@ -12,6 +12,7 @@
 # 7. averaging the output of all heads
 
 # Based on the following tutorial: https://github.com/ebrahimpichka/GAT-pt/blob/main/models.py
+# and https://github.com/AntonioLonga/PytorchGeometricTutorial/blob/main/Tutorial3/Tutorial3.ipynb
 
 import numpy as np
 import torch

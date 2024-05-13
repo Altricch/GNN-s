@@ -19,6 +19,8 @@ The repository is structured as follows:
     │
     ├── requirements.txt                           <- The conda environment requirements.
     |
+    ├── GDL_Report_CA_FH_JD.txt                    <- The final report to our reproduction challenge.
+    |
     ├── ComputationRequirements                    <-  Folder that contains the script for calculating CPU, Memory and Time consumption.
     │    |
     |    ├── compstats.py (not runnable)           <- Script that calculates CPU, Memory and Time consumption, storing the data in a json.
