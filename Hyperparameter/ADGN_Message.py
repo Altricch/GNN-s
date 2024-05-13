@@ -357,7 +357,7 @@ def hyperparameter_search():
 
     # Reimport Dictionary to resume execution
     #file_path = os.path.join(os.path.pardir, "ADGN_Message.py_requirements.json")
-    file_path = 'ADGN_Message.py_requirements.json'
+    file_path = 'comp_per_model/ADGN_Message.py_requirements.json'
     if os.path.exists(file_path):
         print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
         print(file_path)
@@ -368,17 +368,11 @@ def hyperparameter_search():
         print(current_filename)
         current_filename + "_requirements.json"
 
-    #else:
-    #    raise Exception("file not found")
-
     # Possible hyperparameters
     convs = [1, 2, 3, 5, 10, 12, 20, 30]
     learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
     hidden_layers = [4, 8, 12, 24, 48, 64, 128]
-    
-    # convs = [1]
-    # learning_rates = [0.1, 10e-5]
-    # hidden_layers = [4, 8]
+
 
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
     
@@ -409,6 +403,7 @@ def hyperparameter_search():
                 if (counter_conf < 279):
                     counter_conf +=1
                     continue
+                
                 # Train model and get best accuracy
                 print(f"\n[CONFIG] Conv {conv}, Learning Rate {lr}, Hidden_layer {lay}")
                 

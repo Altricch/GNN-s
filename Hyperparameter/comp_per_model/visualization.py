@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
 import json
 
-with open("Hyperparameter/GCN.py_config.json", "r") as file:
+with open("Hyperparameter/comp_per_model/GCN.py_config.json", "r") as file:
     json_data = file.read()
+
 
 name = "GCN"
 

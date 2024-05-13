@@ -3,6 +3,8 @@
 # (Cho et al., 2014) and unroll the recurrence for a fixed number of steps T
 # and use backpropagation through time in order to compute gradients."
 
+# Based on the following tutorial: https://github.com/AntonioLonga/PytorchGeometricTutorial/tree/main/Tutorial9
+
 import os
 import os.path as osp
 import torch

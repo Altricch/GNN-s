@@ -150,26 +150,20 @@ def train(dataset, conv_layer, writer, epochs, lr=0.01, hidden_layer=32):
 
         for batch in loader:
 
-            # Reset gradients
             opt.zero_grad()
 
             # Get the embeddings and the predictions (forward pass)
             embedding, pred = model(batch)
-
-            # Extract the labels
             label = batch.y
 
             # Filter training mask and labels only for node classification
             pred = pred[batch.train_mask]
             label = label[batch.train_mask]
 
-            # Calculate the loss
             loss = model.loss(pred, label)
 
-            # Backward pass
             loss.backward()
 
-            # Update the model weights
             opt.step()
 
             # Accumulate the loss
@@ -209,13 +203,11 @@ def test(loader, model, is_validation=False):
     for data in loader:
         with torch.no_grad():
 
-            # Get the embeddings and the predictions (forward pass)
             embeddings, pred = model(data)
 
             # Get the class with the highest probability
             pred = pred.argmax(dim=1)
 
-            # Get the label from the ground truth
             label = data.y
 
         # Get the mask for the validation or test set
@@ -225,34 +217,28 @@ def test(loader, model, is_validation=False):
         pred = pred[mask]
         label = data.y[mask]
 
-        # Calculate the number of correct predictions
         correct += pred.eq(label).sum().item()
 
     else:
         total = 0
         for data in loader.dataset:
-            # Count the number of nodes in the test set
             total += torch.sum(data.test_mask).item()
     return correct / total
 
 
 def visualization_nodembs(dataset, model):
-    # Color list
     color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
 
-    # Create a data loader
     loader = DataLoader(dataset, batch_size=64, shuffle=True)
 
-    # Embeddings and colors list
     embs = []
     colors = []
 
     for batch in loader:
 
-        # Get the embeddings and the predictions (forward pass)
+
         emb, pred = model(batch)
 
-        # Append the embeddings
         embs.append(emb)
 
         # Collect the colors based on the ground truth
@@ -274,15 +260,12 @@ def visualization_nodembs(dataset, model):
 
 def hyperparameter_search():
 
-    # Variables to store the best hyperparameters
     all_best_acc = float("-inf")
     all_best_lr = 0
     all_best_hidden = 0
 
-    # Get the current filename
     current_filename = os.path.abspath(__file__).split("/")[-1]
-
-    # Dictionary to store the best hyperparameters
+    
     configs = {}
 
     # Possible hyperparameters
@@ -290,10 +273,8 @@ def hyperparameter_search():
     learning_rates = [0.1, 0.01, 10e-3, 10e-4, 10e-5]
     hidden_layers = [4, 8, 12, 24, 48, 64, 128]
 
-    # Load the dataset
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
 
-    # Iterate over the possible convolutional layers
     for conv in convs:
 
         # Reset the best accuracy, learning rate and hidden layer
@@ -301,7 +282,6 @@ def hyperparameter_search():
         all_best_lr = 0
         all_best_hidden = 0
 
-        # Iterate over the possible learning rates and hidden layers
         for lr in learning_rates:
             for lay in hidden_layers:
 
@@ -338,8 +318,3 @@ parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
 if __name__ == "__main__":
 
     hyperparameter_search()
-
-# For report:
-# We changed from ReLU to tanh (as in their implementation)
-# We use a dropout in training
-# We use two hidden layers atm

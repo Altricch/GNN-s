@@ -147,7 +147,6 @@ def train(dataset, conv_layer, writer, epochs):
         with open(file_path, 'r') as file:
             requirements = json.load(file)
     else:
-        print("diuccaro")
         print(current_filename)
         current_filename + "_requirements.json"
     
@@ -303,6 +302,7 @@ if __name__ == "__main__":
     # Node classification
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
-    conv_layer = 3
-    model = train(dataset, conv_layer, writer, 100)
+    conv_layer = args.conv
+    epochs = args.epoch
+    model = train(dataset, conv_layer, writer, epochs)
     visualization_nodembs(dataset, model)

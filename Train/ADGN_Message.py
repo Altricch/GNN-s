@@ -261,7 +261,6 @@ def train(dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True):
         with open(file_path, 'r') as file:
             requirements = json.load(file)
     else:
-        print("diuccaro")
         print(current_filename)
         current_filename + "_requirements.json"
     
@@ -395,7 +394,7 @@ if __name__ == "__main__":
     hidden_dim = args.hidden
     antisymmetry = True if args.asym == 1 else False
     model = train(
-        dataset, 3, 32, writer, epochs, antisymmetry=True
+        dataset, conv_layer, hidden_dim, writer, epochs, antisymmetry=True
     )
 
     # Visualize the node embeddings

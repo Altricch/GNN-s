@@ -3,6 +3,8 @@
 # (Cho et al., 2014) and unroll the recurrence for a fixed number of steps T
 # and use backpropagation through time in order to compute gradients."
 
+# Based on the following tutorial: https://github.com/AntonioLonga/PytorchGeometricTutorial/tree/main/Tutorial9
+
 import os
 import os.path as osp
 import torch
@@ -193,7 +195,6 @@ def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
         with open(file_path, 'r') as file:
             requirements = json.load(file)
     else:
-        print("diuccaro")
         print(current_filename)
         current_filename + "_requirements.json"
     
@@ -360,8 +361,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    epochs = 100
-    convs = 3
+    epochs = args.epoch
+    convs = args.conv
 
     model = train(dataset, epochs=epochs, num_conv=convs, learning_rate=0.001)
     model.__repr__()

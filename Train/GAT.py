@@ -11,6 +11,8 @@
 # 6. Multi-head attention
 # 7. averaging the output of all heads
 
+# Based on the following tutorial: https://github.com/ebrahimpichka/GAT-pt/blob/main/models.py
+
 import numpy as np
 import torch
 import torch.optim as optim
@@ -148,7 +150,6 @@ def train(dataset, hidden_dim, writer, epochs, heads):
         with open(file_path, 'r') as file:
             requirements = json.load(file)
     else:
-        print("diuccaro")
         print(current_filename)
         current_filename + "_requirements.json"
     
@@ -256,8 +257,8 @@ def test(loader, model, is_validation=False):
 ### Flags Areas ###
 parser = argparse.ArgumentParser(description="Process some inputs.")
 parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
-parser.add_argument("--hidden", type=int, help="Hidden Dimension", default=10)
-parser.add_argument("--heads", type=int, help="Use number of heads", default=30)
+parser.add_argument("--hidden", type=int, help="Hidden Dimension", default=32)
+parser.add_argument("--heads", type=int, help="Use number of heads", default=33)
 
 
 if __name__ == "__main__":
@@ -266,7 +267,7 @@ if __name__ == "__main__":
 
     writer = SummaryWriter("./PubMed/" + datetime.now().strftime("%Y%m%d-%H%M%S"))
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
-    heads = 3
-    epochs = 100
-    hidden_dim = 32
+    heads = args.heads
+    epochs = args.epoch
+    hidden_dim = args.hidden
     model = train(dataset, hidden_dim, writer, epochs, heads)

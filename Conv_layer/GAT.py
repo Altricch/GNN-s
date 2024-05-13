@@ -11,6 +11,8 @@
 # 6. Multi-head attention
 # 7. averaging the output of all heads
 
+# Based on the following tutorial: https://github.com/ebrahimpichka/GAT-pt/blob/main/models.py
+
 import numpy as np
 import torch
 import torch.optim as optim

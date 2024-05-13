@@ -141,7 +141,7 @@ def conv():
     
     requirements = {}
     
-    file_path = 'compare_all.py_requirements.json'
+    file_path = 'comp_per_model/compare_all.py_requirements.json'
     if os.path.exists(file_path):
         print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
         print(file_path)
@@ -158,11 +158,6 @@ def conv():
     learning_rates = [0.003]
     hidden_layers = [10, 20, 30]
     models = ["ADGNT", "ADGNF", "GCN", "GAT", "GGNN"]
-    
-    # convs = [1]
-    # learning_rates = [0.003]
-    # hidden_layers = [10]
-    # models = ["ADGNT", "ADGNF"]
     
     dataset = Planetoid(root="/tmp/PubMed", name="PubMed")
     
@@ -276,7 +271,7 @@ def conv():
         averaged_values = [sum(values[i : i + 3]) / 3 for i in range(0, len(values), 3)]
         averaged_data[key] = averaged_values
 
-    with open("Conv_layer/averaged_data.json", "w") as file:
+    with open("Conv_layer/comp_per_model/averaged_data.json", "w") as file:
         json.dump(averaged_data, file, indent=4)
 
     for model, y_values in averaged_data.items():

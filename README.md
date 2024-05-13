@@ -13,29 +13,49 @@ We assume Miniconda/Anaconda is installed.
 ### Repository Structure
 The repository is structured as follows:
 
-
-    ├── README.md                       <- The top-level README.
+    ├── README.md                                  <- The top-level README.
     │
-    ├── requirements.txt                <- The conda environment requirements.
+    ├── requirements.txt                           <- The conda environment requirements.
+    |
+    ├── ComputationRequirements                    <-  Folder that contains the script for calculating CPU, Memory and Time consumption.
+    │    |
+    |    ├── compstats.py                          <- Script that calculates CPU, Memory and Time consumption, storing the data in a json.
     │
-    ├── Conv_layer                      <-  Folder to prof or disprove whether a increase in depth in the model architecture leads to a decay in accuracy of not.
+    ├── Conv_layer                                 <-  Folder to prof or disprove whether a increase in depth in the model architecture leads to a decay in accuracy of not.
+    |    |
+    |    ├──comp_per_model                         <- Folder that contains the script for producing plots, json file (for CPU, Memory and Time)
+    |    |    |
+    |    |    ├── averaged_data.json               <- Average accuracies across all epochs and hidden layers.
+    |    |    |
+    |    |    ├── compare_all.py_requirements.json <- CPU, Memory and Time consumption json file over convolutional layers
+    |    |    |
+    |    |    ├── CPU_vs_Convolutions.png          <- CPU consumption over convolutional layers.
+    |    |    |
+    |    |    ├── Memory_vs_Convolution.png        <- Memory consumption over convolutional layers.
+    |    |    |
+    |    │    ├── requirements_plot.py             <- Script that produces the requirements consumption's visualizations.
+    |    |    |
+    |    |    ├── Time_vs_Convolutions.png         <- Time consumption over convolutional layers.
     │    |
-    |    ├── ADGN_Message.py            <- A-DGN architecture.
+    |    ├── ADGN_Message.py                       <- A-DGN architecture.
     │    |
-    │    ├── averaged_data.json         <- Average accuracies across all epochs and hidden layers.
+    │    ├── compare_all.py                        <- Script that runs the comparison, store the accuracies, store the requirements, and produces the visualization conv_mean_acc_plot.png.
+    |    ├── conv_mean_acc_plot.png                <- Accuracy plot with an increase number of layers for each model.
     │    |
-    │    ├── compare_all.py             <- Script that runs the comparison, store the accuracies, and produces the visualization conv_mean_acc_plot.png.
-    │    |
-    │    ├── conv_mean_acc_plot.png     <- Accuracy plot with an increase number of layers for each model.
-    │    |
-    │    ├── GCN.py                     <- GCN (Graph Convolution Network) architecture.
+    │    ├── GAT.py                                <- GAT architecture.
+    |    |
+    │    ├── GCN.py                                <- GCN architecture.
+    |    |
+    │    ├── GGNN.py                               <- GGNN architecture.
     │
-    ├── GNN_Basics                      <- Basic examples for our understanding.
+    ├── GNN_Basics                                 <- Basic examples for our understanding.
     |   |
-    |   ├── CustomConv.py               <- Standard implementation for a graph convolution.
+    |   ├── CustomConv.py                          <- Standard implementation for a graph convolution.
     │   |
-    │   ├── GNN.py                      <- Standard implementation of a Graph Neural Network.
+    │   ├── GNN.py                                 <- Standard implementation of a Graph Neural Network.
     |   
+
+
     ├── Hyperparameter                  <- Folder for grid-search and corresponding visualization/results.
     |   |
     |   ├── ADGN_Message                <- Script that performs grid-search for ADGN.
@@ -52,6 +72,14 @@ The repository is structured as follows:
     |   |
     |   ├── visualization.py            <- Script that generates both GCN.png and ADGN.png.
     |
+
+
+
+
+
+
+
+
     ├── PDFs                             <- PDFs Folder.
     |   |
     |   ├── ADGN.pdf                    <- ADGN paper.
@@ -69,3 +97,5 @@ The repository is structured as follows:
     |   ├── GCN.py                      <- GCN.
     |   |
     |   ├── GGNN.py                     <- GGNN.
+
+Since time constraints, note that
