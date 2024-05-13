@@ -103,14 +103,6 @@ The repository is structured as follows:
     |   |
     |   ├── max_eigenvalues.png                    <- Plot of the max eigenvalues over epochs with anti symmetric both True and False
     |
-    ├── Model_Papers_PDF                           <- PDFs Folder.
-    |   |
-    |   ├── ADGN.pdf                               <- ADGN paper.
-    |   |
-    |   ├── GAT.pdf                                <- GAT paper.
-    |   |
-    |   ├── GGNN.pdf                               <- GGNN paper.
-    |
     ├── Train                                      <- Folder with our models for simple training and script correctness.
     |   |
     |   ├── comp_per_model                         <- Folder that contains comparison JSON files and plots.
