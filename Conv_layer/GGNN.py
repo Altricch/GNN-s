@@ -30,11 +30,12 @@ torch.manual_seed(42)
 # BASE Class for information propagation and update amongst nodes
 class GatedGraphConv(MessagePassing):
 
-    def __init__(self, out_channels, num_layers, aggr="add", bias=True, **kwargs):
+    def __init__(self, dataset, out_channels, num_layers, aggr="add", bias=True, **kwargs):
         super(GatedGraphConv, self).__init__(aggr=aggr, **kwargs)
 
         self.out_channels = out_channels
         self.num_layers = num_layers
+        self.data = dataset[0]
 
         self.rnn = torch.nn.GRUCell(self.out_channels, self.out_channels, bias=bias)
         self.weight = Param(
@@ -49,8 +50,8 @@ class GatedGraphConv(MessagePassing):
 
     def forward(self, x):
 
-        edge_index = data.edge_index
-        edge_weight = data.edge_attr
+        edge_index = self.data.edge_index
+        edge_weight = self.data.edge_attr
 
         if x.size(-1) > self.out_channels:
             raise ValueError(
@@ -113,12 +114,14 @@ class GGNN(torch.nn.Module):
     def __init__(
         self,
         in_channels,
+        dataset,
         out_channels=None,
         num_conv=3,
         hidden_dim=32,
         aggr="add",
         mlp_hdim=32,
         mlp_hlayers=3,
+        
     ):
         super(GGNN, self).__init__()
         self.emb = lambda x: x
@@ -131,7 +134,7 @@ class GGNN(torch.nn.Module):
             print("mismatch, operating a reduction")
             self.emb = nn.Linear(in_channels, hidden_dim, bias=False)
 
-        self.conv = GatedGraphConv(out_channels=out_channels, num_layers=num_conv)
+        self.conv = GatedGraphConv(dataset=dataset, out_channels=out_channels, num_layers=num_conv)
 
         self.mlp = MLP(input_dim=out_channels, hid_dims=[mlp_hdim] * mlp_hlayers)
 
@@ -153,174 +156,3 @@ class GGNN(torch.nn.Module):
 
         # Prediction
         return x_emb, F.log_softmax(x_emb, dim=-1)
-
-
-# endregion
-
-# region Training
-
-
-def train(dataset, epochs=100, num_conv=3, learning_rate=0.001):
-    ###### SETUP ######
-    start_time = time.time()
-    test_loader = loader = DataLoader(dataset, batch_size=1, shuffle=True)
-    model = GGNN(
-        in_channels=dataset.x.shape[-1], out_channels=32, num_conv=num_conv
-    ).to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-    loss_fn = nn.CrossEntropyLoss()
-    tot_loss = 0
-    best_acc = [0, 0, 0]
-
-    print("#" * 100 + "\n")
-    print("[MODEL REPRESENTATION]", repr(model))
-    print(
-        "#" * 20
-        + f" Running Gated GNN, with {str(epochs)} epochs, {str(num_conv)} convs "
-        + "#" * 20
-    )
-    ####################
-
-    for epoch in range(1, epochs + 1):
-        print(f"Processing Epoch {epoch}", end="\r")
-        epoch_start_time = datetime.now()
-        model.train()
-
-        for batch in loader:
-            optimizer.zero_grad()
-
-            # Forward pass
-            emb_x, pred = model(batch)
-
-            # extract prediction and label
-            pred = pred[batch.train_mask]
-            label = batch.y[batch.train_mask]
-
-            loss = loss_fn(pred, label)
-            loss_fn(pred, label).backward()
-
-            optimizer.step()
-            tot_loss += loss.item()
-
-        tot_loss /= len(loader.dataset)
-        ###
-
-        ### Test
-        if epoch % 10 == 0:
-            model.eval()
-            for data in test_loader:
-                with torch.no_grad():
-                    accs = []
-                    # Forward pass
-                    emb, logits = model(data)
-                    masks = [data.train_mask, data.val_mask, data.test_mask]
-                    for mask in masks:
-
-                        # Obtain most likely class
-                        pred = logits[mask].max(1)[1]
-
-                        # Compute accuracy
-                        acc = pred.eq(data.y[mask]).sum().item() / mask.sum().item()
-                        accs.append(acc)
-
-                # Collecting and computing best accuracies for each set
-                train_acc = accs[0]
-                val_acc = accs[1]
-                test_acc = accs[2]
-
-                best_acc[0] = max(best_acc[0], train_acc)
-                best_acc[1] = max(best_acc[1], val_acc)
-                best_acc[2] = max(best_acc[2], test_acc)
-
-                model.best_acc = best_acc[2]
-
-            print(
-                "Epoch: {:03d}, Train Acc: {:.0%}, "
-                "Val Acc: {:.0%}, Test Acc: {:.0%}, time for 10 epochs {:.2f}".format(
-                    epoch, train_acc, val_acc, test_acc, epoch_start_time
-                )
-            )
-
-    print("Training Completed in {:.2f} seconds".format(time.time() - start_time))
-    print(
-        "Best Accuracies Train Acc: {:.0%}, Val Acc: {:.0%}, Test Acc: {:.0%}".format(
-            best_acc[0], best_acc[1], best_acc[2]
-        )
-    )
-
-    return model
-
-
-# endregion
-
-
-# region Visualisation
-def visualization_nodembs(dataset, model):
-    color_list = ["red", "orange", "green", "blue", "purple", "brown", "black"]
-    loader = DataLoader(dataset, batch_size=1, shuffle=False)
-    embs = []
-    colors = []
-
-    for batch in loader:
-        print("batch is", batch)
-        emb, pred = model(batch)
-        embs.append(emb)
-
-        colors += [color_list[y] for y in batch.y]
-    embs = torch.cat(embs, dim=0)
-
-    # Get the 2D representation of the embeddings
-    xs, ys = zip(*TSNE(random_state=42).fit_transform(embs.detach().numpy()))
-
-    # Plot the 2D representation
-    plt.scatter(xs, ys, color=colors)
-    plt.title(
-        f"GGNN, #epoch:{str(args.epoch)}, #conv:{str(args.conv)}\n accuracy:{model.best_acc*100}%"
-    )
-    plt.show()
-
-
-# endregion
-
-### Flags Areas ###
-import argparse
-
-parser = argparse.ArgumentParser(description="Process some inputs.")
-parser.add_argument("--epoch", type=int, help="Epoch Amount", default=100)
-parser.add_argument("--conv", type=int, help="Conv Amount", default=3)
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = "cpu"
-
-dataset = "PubMed"
-transform = T.Compose(
-    [
-        T.TargetIndegree(),
-    ]
-)
-path = osp.join("data", dataset)
-dataset = Planetoid(path, dataset, transform=transform)
-
-data = dataset[0]
-
-print("[DATA],", data)
-
-
-# region Execution
-if __name__ == "__main__":
-
-    test_dataset = dataset[: len(dataset) // 10]
-    train_dataset = dataset[len(dataset) // 10 :]
-    test_loader = DataLoader(test_dataset)
-    train_loader = DataLoader(train_dataset)
-
-    args = parser.parse_args()
-
-    epochs = args.epoch
-    convs = args.conv
-
-    model = train(dataset, epochs=epochs, num_conv=convs, learning_rate=0.001)
-    model.__repr__()
-    visualization_nodembs(dataset, model)
-
-# endregion

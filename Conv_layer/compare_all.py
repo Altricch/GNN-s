@@ -141,7 +141,7 @@ def conv():
     
     requirements = {}
     
-    file_path = 'comp_per_model/compare_all.py_requirements.json'
+    file_path = 'Conv_layer/comp_per_model/compare_all.py_requirements.json'
     if os.path.exists(file_path):
         print("[WARNING]\n Importing an already existing json file for the requirements dictionary")
         print(file_path)
@@ -212,6 +212,7 @@ def conv():
                         loss_fn = nn.CrossEntropyLoss()
                         model = GGNN(
                             in_channels=dataset.x.shape[-1],
+                            dataset=dataset,
                             out_channels=lay,
                             num_conv=conv,
                             hidden_dim=lay,
@@ -242,13 +243,14 @@ def conv():
                     )
                     conv_mean_acc[m].append(mean_accuracy)
                     
+                    
+                    # UNCOMMENT TO RECOMPUTE STATISTICS
                     computeStatsModel(conf_start_time, conv, lr, lay, current_process, num_cpus, requirements, m, True, file_path, counter_conf)
                     counter_conf += 1
 
     # NEXT LINE ONLY FOR CPU AND MEMORY REQUIREMENTS
-    writer.close()
+    # writer.close()
     
-    '''
     for j, conv in enumerate(convs):
         writer.add_scalars(
             "test accuracy",
@@ -288,8 +290,6 @@ def conv():
 
     # Show plot
     plt.show()
-    
-    '''
 
 
 if __name__ == "__main__":

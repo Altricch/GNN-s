@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 # This file is used to plot the average CPU, Memory and Time taken by different models with different number of convolution layers
 # The data is taken from the file compare_all.py_requirements.json
 
-filename = 'compare_all.py_requirements.json'
+dir_path = "Conv_layer/comp_per_model/"
+filename = dir_path+'compare_all.py_requirements.json'
 
 with open(filename, 'r') as file:
     data = json.load(file)
@@ -53,6 +54,6 @@ for column in columns:
     ax.legend()
 
     # Save the figure
-    fig_name = f'{column}_vs_Convolutions.png'
+    fig_name = f'{dir_path}{column}_vs_Convolutions.png'
     fig.savefig(fig_name)
     plt.close(fig) 
